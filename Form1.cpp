@@ -88,6 +88,15 @@ namespace forms2{
 	bool Form1::isSingleFrame(){
 		return singleFrameCheckBox->Checked;
 	}
+	bool Form1::isFalseColor(){
+		return falseColorCheckbox->Checked;
+	}
+	bool Form1::isNormalized(){
+		return normalizeCheckbox->Checked;
+	}
+	int Form1::getMaxScale(){
+		return int(scaleMaxField->Value);
+	}
 	void Form1::setSingleFrame(bool sf){
 		 imgThread->setSingleFrame(sf);
 		 camThread->setSingleFrame(sf);

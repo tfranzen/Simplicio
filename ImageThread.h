@@ -28,5 +28,11 @@ namespace forms2{
 		bool singleFrame;
 		void init(Form1^ f);
 		void processNewImage();
+
+		array<array<Byte>^>^ falseColorScale;
+		array<array<Byte>^>^ generateFalseColorScale();
+		bool useFalseColor;
+		bool normalize;
+		UInt16 scaleMax;
 	};
 }

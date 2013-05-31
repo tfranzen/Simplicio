@@ -1,7 +1,8 @@
 #pragma once
 
 namespace forms2{
-	
+#include "globalobjects.h"
+
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -13,11 +14,7 @@ namespace forms2{
 	//using namespace System::IO;
 	using namespace DataStructures;
 	
-	ref class SimplicioServer;
-	ref class CameraThread;
-	ref class ImageThread;
-	ref class ImageData;
-	class CameraSettings;
+
 	
 	/// <summary>
 	/// Summary for Form1
@@ -91,6 +88,9 @@ namespace forms2{
 	private: System::Windows::Forms::TextBox^  serverNameBox;
 	private: System::Windows::Forms::Label^  label1;
 	private: System::Windows::Forms::Label^  currentServerNameLabel;
+	private: System::Windows::Forms::CheckBox^  normalizeCheckbox;
+	private: System::Windows::Forms::CheckBox^  falseColorCheckbox;
+	private: System::Windows::Forms::NumericUpDown^  scaleMaxField;
 
 
 
@@ -133,7 +133,10 @@ namespace forms2{
 			this->zoomBox = (gcnew System::Windows::Forms::NumericUpDown());
 			this->zoomLabel = (gcnew System::Windows::Forms::Label());
 			this->previewGroup = (gcnew System::Windows::Forms::GroupBox());
+			this->scaleMaxField = (gcnew System::Windows::Forms::NumericUpDown());
+			this->normalizeCheckbox = (gcnew System::Windows::Forms::CheckBox());
 			this->saveButton = (gcnew System::Windows::Forms::Button());
+			this->falseColorCheckbox = (gcnew System::Windows::Forms::CheckBox());
 			this->zoomLabel2 = (gcnew System::Windows::Forms::Label());
 			this->pixelSizeLabel = (gcnew System::Windows::Forms::Label());
 			this->pixelSizeBox = (gcnew System::Windows::Forms::NumericUpDown());
@@ -150,6 +153,7 @@ namespace forms2{
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBox))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->zoomBox))->BeginInit();
 			this->previewGroup->SuspendLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->scaleMaxField))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pixelSizeBox))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -345,7 +349,7 @@ namespace forms2{
 			this->zoomBox->Name = L"zoomBox";
 			this->zoomBox->Size = System::Drawing::Size(32, 20);
 			this->zoomBox->TabIndex = 21;
-			this->zoomBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {2, 0, 0, 0});
+			this->zoomBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {1, 0, 0, 0});
 			// 
 			// zoomLabel
 			// 
@@ -358,7 +362,10 @@ namespace forms2{
 			// 
 			// previewGroup
 			// 
+			this->previewGroup->Controls->Add(this->scaleMaxField);
+			this->previewGroup->Controls->Add(this->normalizeCheckbox);
 			this->previewGroup->Controls->Add(this->saveButton);
+			this->previewGroup->Controls->Add(this->falseColorCheckbox);
 			this->previewGroup->Controls->Add(this->zoomLabel2);
 			this->previewGroup->Controls->Add(this->pixelSizeLabel);
 			this->previewGroup->Controls->Add(this->pixelSizeBox);
@@ -373,6 +380,27 @@ namespace forms2{
 			this->previewGroup->TabStop = false;
 			this->previewGroup->Text = L"Image Preview";
 			// 
+			// scaleMaxField
+			// 
+			this->scaleMaxField->Increment = System::Decimal(gcnew cli::array< System::Int32 >(4) {100, 0, 0, 0});
+			this->scaleMaxField->Location = System::Drawing::Point(146, 254);
+			this->scaleMaxField->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) {65535, 0, 0, 0});
+			this->scaleMaxField->Minimum = System::Decimal(gcnew cli::array< System::Int32 >(4) {255, 0, 0, 0});
+			this->scaleMaxField->Name = L"scaleMaxField";
+			this->scaleMaxField->Size = System::Drawing::Size(55, 20);
+			this->scaleMaxField->TabIndex = 36;
+			this->scaleMaxField->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {65535, 0, 0, 0});
+			// 
+			// normalizeCheckbox
+			// 
+			this->normalizeCheckbox->AutoSize = true;
+			this->normalizeCheckbox->Location = System::Drawing::Point(22, 250);
+			this->normalizeCheckbox->Name = L"normalizeCheckbox";
+			this->normalizeCheckbox->Size = System::Drawing::Size(70, 17);
+			this->normalizeCheckbox->TabIndex = 35;
+			this->normalizeCheckbox->Text = L"normalize";
+			this->normalizeCheckbox->UseVisualStyleBackColor = true;
+			// 
 			// saveButton
 			// 
 			this->saveButton->Location = System::Drawing::Point(140, 227);
@@ -382,6 +410,16 @@ namespace forms2{
 			this->saveButton->Text = L"Save Image Data";
 			this->saveButton->UseVisualStyleBackColor = true;
 			this->saveButton->Click += gcnew System::EventHandler(this, &Form1::saveButton_Click);
+			// 
+			// falseColorCheckbox
+			// 
+			this->falseColorCheckbox->AutoSize = true;
+			this->falseColorCheckbox->Location = System::Drawing::Point(22, 227);
+			this->falseColorCheckbox->Name = L"falseColorCheckbox";
+			this->falseColorCheckbox->Size = System::Drawing::Size(79, 17);
+			this->falseColorCheckbox->TabIndex = 34;
+			this->falseColorCheckbox->Text = L"false colors";
+			this->falseColorCheckbox->UseVisualStyleBackColor = true;
 			// 
 			// zoomLabel2
 			// 
@@ -445,7 +483,8 @@ namespace forms2{
 			// cameraListBox
 			// 
 			this->cameraListBox->FormattingEnabled = true;
-			this->cameraListBox->Items->AddRange(gcnew cli::array< System::Object^  >(3) {L"No Camera", L"Sensicam", L"Princeton Instruments (WinView)"});
+			this->cameraListBox->Items->AddRange(gcnew cli::array< System::Object^  >(4) {L"No Camera", L"Sensicam", L"Princeton Instruments (WinView)", 
+				L"Apogee"});
 			this->cameraListBox->Location = System::Drawing::Point(59, 170);
 			this->cameraListBox->Name = L"cameraListBox";
 			this->cameraListBox->Size = System::Drawing::Size(242, 56);
@@ -539,6 +578,7 @@ namespace forms2{
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->zoomBox))->EndInit();
 			this->previewGroup->ResumeLayout(false);
 			this->previewGroup->PerformLayout();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->scaleMaxField))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pixelSizeBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
@@ -555,6 +595,10 @@ namespace forms2{
 		void sequenceStarted(LinkedList<Variable^>^ listvars);
 		void setNextTime(DateTime nextTime);
 		bool isSingleFrame();
+		
+		bool isFalseColor();
+		bool isNormalized();
+		int getMaxScale();
 		String^ getSavePath();
 		void setServerName(String^ name);
 		//BufferedGraphicsContext^ getContext(){return context;}

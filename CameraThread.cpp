@@ -7,6 +7,7 @@
 #include "SencamDriver.h"
 #include "WinXDriver.h"
 #include "TestDriver.h"
+#include "ApogeeDriver.h"
 //#include "SC2Driver.h"
 
 //#include "cam_types.h"
@@ -67,6 +68,8 @@ namespace forms2{
 				newdriver=nullptr;
 				MessageBox::Show("Couldn't connect to WinView.","Simplicio",MessageBoxButtons::OK);
 			}
+		}else if (camname->Equals(gcnew String(L"Apogee"))){
+			newdriver = (Driver ^)gcnew ApogeeDriver();
 		}else{
 			MessageBox::Show("Unsupported camera type requested.","Simplicio",MessageBoxButtons::OK);
 		}
@@ -313,8 +316,8 @@ namespace forms2{
 				int temprows=rows;
 				
 				if (singleFrame){//hijacks existing code to implement this new feature
-					templayers = 8;
-					temprows = 128;
+					//templayers = 8;
+					//temprows = 128;
 				}
 				
 				ImageData^ img = gcnew ImageData(buf,temprows,cols,templayers,(dbl==2),singleFrame,datetime); 

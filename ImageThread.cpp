@@ -18,9 +18,19 @@ namespace forms2{
 		saveFile=true;
 		singleFrame = f->isSingleFrame();
 		addBuffersMainForm = gcnew DelegateBuffersIntImg(f,&Form1::addBuffers);
+
+		falseColorScale = generateFalseColorScale();
+		useFalseColor = mainForm->isFalseColor();
+		normalize = mainForm->isNormalized();
+		scaleMax = mainForm->getMaxScale();
+
 	}
 	bool ImageThread::processImage(ImageData^ img, bool savefile,int binsize,int pixelsize){
 		if (processing || img==nullptr) return true;
+
+		useFalseColor = mainForm->isFalseColor();
+		normalize = mainForm->isNormalized();
+		scaleMax = mainForm->getMaxScale();
 		imageData = img;
 		saveFile = savefile;
 		binSize=binsize;
@@ -31,6 +41,46 @@ namespace forms2{
 	}
 	int max(int x,int y){return x>y?x:y;}
 	int min(int x,int y){return x<y?x:y;}
+
+
+	array<array<Byte>^>^ ImageThread::generateFalseColorScale(){
+		array<array<Byte>^>^ s = gcnew array<array<Byte>^>(256);
+		for(int i=0;i<256;i++){
+			s[i] = gcnew array<Byte>(3);
+			if (i==0){
+				s[i][2] = 0;
+				s[i][1] = 0;
+				s[i][0] = 0;
+			} else if (i < 64) {
+				s[i][2] = 0;
+				s[i][1] = i*4;
+				s[i][0] = 255;
+			} else if (i<128) {
+				s[i][2] = 0;
+				s[i][1] = 4 * (128 - i);
+				s[i][0] = 255;
+			} else if (i < 192) {
+				s[i][2] = 4*(i-128);
+				s[i][1] = 255;
+				s[i][0] = 0;
+			} else if (i < 255) {
+				s[i][2] = 255;
+				s[i][1] = 255-4*i;
+				s[i][0] = 0;
+			} else{
+				s[i][2] = 255;
+				s[i][1] = 255;
+				s[i][0] = 255;
+			}
+		}
+		return s;
+	}
+
+	
+
+
+
+
 	void ImageThread::processNewImage(){
 		//creates new buffers and calculates values
 		//report to Form1: buffers, numBuffers, [imageData--or write calculations to buffers]
@@ -39,7 +89,7 @@ namespace forms2{
 		
 		//allocate new buffers
 		int layers = imageData->getLayers();
-		bool makePreview=(layers==3 || singleFrame);
+		bool makePreview=(layers==3 || singleFrame || layers == 2);
 		numBuffers = layers;
 		if (makePreview)
 			numBuffers++;//create an extra buffer
@@ -92,17 +142,26 @@ namespace forms2{
 				//read each layer and draw
 				for (int lay(0);lay<layers;lay++){
 					counts[lay] = imageData->getValue(r,c,lay,0);
-					ratio = (255*counts[lay])/maxVals[lay];
+					if(normalize)
+						ratio = (255*counts[lay])/maxVals[lay];
+					else
+						ratio = (255*counts[lay])/scaleMax;
 					value = (int)ratio;
-					if (value>255){ MessageBox::Show("Color value  > 255","Box",MessageBoxButtons::OK); value=255;}
+					if (value>255){ /*MessageBox::Show("Color value  > 255","Box",MessageBoxButtons::OK);*/ value=255;}
 					//brush->Color = Color::FromArgb(value,value,value);
 					bufLay = lay;
 					//if (layers==3 || singleFrame) bufLay++;//make space for preview layer
 					if (makePreview) bufLay++;//make space for preview layer
 					x = pixelSize*c/binSize;
 					y = pixelSize*r/binSize;
-					for (int rgb=0;rgb<4;rgb++)
-						bmpValues[bufLay][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:value;
+					if(useFalseColor){					
+						for (int rgb=0;rgb<4;rgb++)
+							bmpValues[bufLay][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+					}
+					else{
+						for (int rgb=0;rgb<4;rgb++)
+							bmpValues[bufLay][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:value;
+					}
 					//bitmaps[bufLay]->SetPixel(pixelSize*c/binSize,pixelSize*r/binSize,Color::FromArgb(value,value,value));
 					//buffers[bufLay]->Graphics->FillRectangle(brush,Rectangle(pixelSize*c/binSize,pixelSize*r/binSize,pixelSize,pixelSize));
 				}
@@ -120,7 +179,7 @@ namespace forms2{
 					DF=counts[2];
 				}
 				
-				if (makePreview)//define preview layer for three frame imaging
+				if (makePreview && layers==3)//define preview layer for three frame imaging
 				{	
 					//if ((counts[0] > counts[2])&&(counts[1]>counts[2])){
 					if ((PWA > DF)&&(PWOA>DF)){
@@ -137,8 +196,14 @@ namespace forms2{
 						value = (int)ratio;
 						x = pixelSize*c/binSize;
 						y = pixelSize*r/binSize;
-						for (int rgb=0;rgb<4;rgb++)
-							bmpValues[0][y*stride+bytesPerPixel*x+rgb] =(rgb==3)? 255:value;
+						if(useFalseColor){					
+							for (int rgb=0;rgb<4;rgb++)
+								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+						}
+						else{
+							for (int rgb=0;rgb<4;rgb++)
+								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:value;
+						}
 						//bitmaps[0]->SetPixel(pixelSize*c/binSize,pixelSize*r/binSize,Color::FromArgb(value,value,value));
 						//brush->Color = Color::FromArgb(value,value,value);
 						//buffers[0]->Graphics->FillRectangle(brush,Rectangle(pixelSize*c/binSize,pixelSize*r/binSize,pixelSize,pixelSize));
@@ -155,6 +220,25 @@ namespace forms2{
 					//add to Ncount
 					Ncount += -Math::Log(floatRatio) * binSize * binSize;		
 				}//end of layers==3
+				else if (makePreview && layers==2)//define preview layer for three frame imaging
+				{	
+						/*if(normalize)
+							ratio = (255*(counts[0]-counts[1]))/maxVals[0];
+						else*/
+							ratio = (255*(counts[0]-counts[1]))/scaleMax;
+						value = min(255,(int)ratio);
+						x = pixelSize*c/binSize;
+						y = pixelSize*r/binSize;
+						if(useFalseColor){					
+							for (int rgb=0;rgb<4;rgb++)
+								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+						}
+						else{
+							for (int rgb=0;rgb<4;rgb++)
+								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:value;
+						}						
+						Ncount += value * binSize * binSize;		
+				}//end of layers==2
 			}//end for loop on c
 		}//end for loop on r
 
@@ -182,12 +266,13 @@ namespace forms2{
 				int lay = bufLay;//image data layer for max value
 				if (makePreview) lay--;
 				strList->AddLast(String::Format("Maximum Value: {0}",maxVals[lay]));
-			}else 
-			{//transmission image
+			}
+			//	else 
+			//{//transmission image
 				strList->AddLast(String::Format("Ncount: {0}",(int)Ncount));
 				for each(Variable^ var in imageData->getSeqVars())
 					strList->AddLast(String::Format("{0} = {1}", var->VariableName, var->VariableValue));
-			}
+			//}
 			strList->AddFirst(imageData->getDateTimeString());
 			buffers[bufLay]->Graphics->FillRectangle(brush,Rectangle(x,y,bw,bh*strList->Count));
 			int strInd(0);
@@ -210,6 +295,7 @@ namespace forms2{
 		parameters[2] = imageData;
 		mainForm->BeginInvoke(addBuffersMainForm, parameters);
 		processing=false;
+
 	}
 
 }

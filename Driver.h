@@ -4,7 +4,7 @@
 namespace forms2{
 	using namespace System;
 
-	ref class Driver abstract{
+	public ref class Driver abstract{
 	public:
 			
 		virtual int initCamera()=0;

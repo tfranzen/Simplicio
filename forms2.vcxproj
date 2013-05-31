@@ -134,6 +134,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ApogeeDialog.cpp" />
+    <ClCompile Include="ApogeeDriver.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="CameraSettings.cpp" />
     <ClCompile Include="CameraThread.cpp" />
@@ -153,6 +155,10 @@
     <ClCompile Include="WinXDriver.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ApogeeDialog.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="ApogeeDriver.h" />
     <ClInclude Include="CameraSettings.h" />
     <ClInclude Include="CameraThread.h" />
     <ClInclude Include="Driver.h" />
@@ -160,6 +166,7 @@
     <ClInclude Include="Form1.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="globalobjects.h" />
     <ClInclude Include="ImageData.h" />
     <ClInclude Include="ImageThread.h" />
     <ClInclude Include="resource.h" />
@@ -176,10 +183,23 @@
     <ResourceCompile Include="app.rc" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ApogeeDialog.resx">
+      <DependentUpon>ApogeeDialog.h</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resX">
       <DependentUpon>Form1.h</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="APOGEELib.1.0.dll">
+      <Guid>a2882c73-7cfb-11d4-9155-0060676644c1</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>false</Isolated>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
