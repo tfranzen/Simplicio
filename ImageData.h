@@ -33,6 +33,7 @@ namespace forms2{
 		UInt16 getMaxValue(int layer, int frame);
 		UInt16 getMaxValue(int layer);
 		void saveFile(String^ path);
+		void saveFileDus(String^ path);
 		void setSeqVars(LinkedList<Variable^>^ vars);
 		LinkedList<Variable^>^ getSeqVars(){return seqVars;}
 
