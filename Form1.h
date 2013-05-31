@@ -274,7 +274,7 @@ namespace forms2{
 			// 
 			this->formatListBox->ColumnWidth = 25;
 			this->formatListBox->FormattingEnabled = true;
-			this->formatListBox->Items->AddRange(gcnew cli::array< System::Object^  >(3) {L"aia", L"h5", L"tif"});
+			this->formatListBox->Items->AddRange(gcnew cli::array< System::Object^  >(4) {L"aia", L"h5", L"tif", L"dus"});
 			this->formatListBox->Location = System::Drawing::Point(82, 66);
 			this->formatListBox->MultiColumn = true;
 			this->formatListBox->Name = L"formatListBox";
@@ -595,7 +595,7 @@ namespace forms2{
 		void sequenceStarted(LinkedList<Variable^>^ listvars);
 		void setNextTime(DateTime nextTime);
 		bool isSingleFrame();
-		
+		String^ getSaveFormat();
 		bool isFalseColor();
 		bool isNormalized();
 		int getMaxScale();
@@ -697,6 +697,7 @@ private: System::Void serverNameBox_KeyUp(System::Object^  sender, System::Windo
 				setServerName(serverNameBox->Text);
 			}
 		 }
+
 };
 }
 

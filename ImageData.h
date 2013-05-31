@@ -32,8 +32,7 @@ namespace forms2{
 		String^ getDateTimeString();
 		UInt16 getMaxValue(int layer, int frame);
 		UInt16 getMaxValue(int layer);
-		void saveFile(String^ path);
-		void saveFileDus(String^ path);
+		void saveFile(String^ path, String^ format);
 		void setSeqVars(LinkedList<Variable^>^ vars);
 		LinkedList<Variable^>^ getSeqVars(){return seqVars;}
 
@@ -50,6 +49,7 @@ namespace forms2{
 		DateTime dateTime;//time and date when this ImageData object was created
 
 		void init(UInt16* b, int r, int c, int l, bool d, bool sf, DateTime dt);
-
+		void saveFileAIA(String^ path);
+		void saveFileDus(String^ path);
 	};
 }

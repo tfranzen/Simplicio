@@ -325,7 +325,7 @@ namespace forms2{
 				seqVars->Clear();
 				//save
 				if (save) //saveImage(img);
-					img->saveFile(filePath);
+					img->saveFile(filePath,"dus");
 				//send the image to the main window
 				gotImage(img);
 				//saveImage(img);//(UInt16)rows*dbl,(UInt16)cols,(UInt16)layers,buf);
@@ -337,47 +337,7 @@ namespace forms2{
 		///if (runErr) MessageBox::Show("Acquisition stopped ","Box",MessageBoxButtons::OK);
 		finishedRunning();
 	}
-	/*
-	void CameraThread::saveImage(ImageData^ img)//UInt16 rows, UInt16 cols, UInt16 layers, UInt16 *buf)
-	{	//saves a 16-bit AIA file in little endian
-		
-		String^ extension =".aia";
-		String^ basename = String::Format("{0}\\{1}",filePath,img->getDateTimeString());
-		String^ filename = String::Copy(basename);
-		
-		//prevent overwrite by renaming
-		for (int i=0; (i<1000) && File::Exists(String::Concat(filename,extension));i++){
-			filename =String::Format("{0} Copy {1}",basename,i);// String::Concat(basename,i);
-		}
-		filename = String::Concat(filename,extension);
-		if (File::Exists(filename)) return;
-
-		FileStream^ fs = File::Open(filename,FileMode::Create);
-		BinaryWriter^ bw = gcnew BinaryWriter(fs);
-		try{
-			Byte b0 = 0x41;
-			Byte b1 = 0x49;
-			Byte b2 = 0x41;
-			bw->Write(b0);
-			bw->Write(b1);
-			bw->Write(b2);
-			UInt16 intLength = 2;
-			bw->Write(intLength);
-			int rows = (img->getRows())*(img->getDoubler());
-			int cols = img->getCols();
-			int layers = img->getLayers();
-			bw->Write((UInt16)rows);
-			bw->Write((UInt16)cols);
-			bw->Write((UInt16)layers);		
-			for (int i=0;i<rows*cols*layers;i++)
-				bw->Write(img->getValue(i));
-		}
-		finally{
-			bw->Close();
-			fs->Close();
-		}
-	}
-	*/
+	
 	void CameraThread::setNextTime(DateTime nexttime){
 		nextTime=nexttime;
 	}

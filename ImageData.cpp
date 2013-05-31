@@ -53,7 +53,20 @@ namespace forms2{
 		DateTime dt = dateTime;
 		return String::Format("{0:d4}-{1:d2}-{2:d2}-{3:d2};{4:d2};{5:d2}",dt.Year,dt.Month,dt.Day,dt.Hour,dt.Minute,dt.Second);
 	}
-	void ImageData::saveFile(String^ filePath)
+
+	void ImageData::saveFile(String^ filePath, String^ format)
+	{
+		
+		if(String::Compare(format, "aia")==0){
+			saveFileAIA(filePath);
+		}else if (String::Compare(format, "dus")==0){
+			saveFileDus(filePath);
+		}else{
+			//System::MessageBox::Show(String::Format("Unknown file format requested: {0}.",format),"Box",MessageBoxButtons::OK);
+		}
+	}
+
+	void ImageData::saveFileAIA(String^ filePath)
 	{	//saves a 16-bit AIA file in little endian
 		
 		String^ extension =".aia";
@@ -113,7 +126,7 @@ namespace forms2{
 		}
 	}
 	void ImageData::saveFileDus(String^ filePath)
-	{	//saves a 16-bit AIA file in little endian
+	{	//saves to PAR+I16 files for Duesseldorf/Sttuttgart MATLAB scripts
 		
 		String^ extension =".par";
 		DateTime dt = dateTime;
@@ -143,13 +156,13 @@ namespace forms2{
 			tw->WriteLine(String::Format("height={0}",getRows()));
 			switch(layers){
 			case 1:
-				tw->WriteLine("mode=3");
+				tw->WriteLine("mode=3"); //single picture
 				break;
 			case 2:
-				tw->WriteLine("mode=1");
+				tw->WriteLine("mode=1"); // fluorescence
 				break;
 			case 3:
-				tw->WriteLine("mode=2");
+				tw->WriteLine("mode=2"); // absorption
 				break;
 			}
 			

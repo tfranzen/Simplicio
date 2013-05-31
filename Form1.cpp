@@ -247,11 +247,14 @@ namespace forms2{
 	String^ Form1::getSavePath(){
 		return folderLabel->Text;
 	}
+	String^ Form1::getSaveFormat(){
+		return formatListBox->SelectedItem->ToString();
+	}
 	void Form1::saveImage(int stepsBack){
 		int bInd = getHistoryIndex(stepsBack);
 		if (bInd<0) return;
 		if (imgDataArray[bInd]==nullptr) return;
-		imgDataArray[bInd]->saveFile(getSavePath());
+		imgDataArray[bInd]->saveFile(getSavePath(),getSaveFormat());
 		setDisplayImage(displayedImgInd,displayedLayer);//updates the save button
 	}
 	int Form1::getHistoryIndex(int stepsBack){
