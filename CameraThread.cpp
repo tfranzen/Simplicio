@@ -33,6 +33,7 @@ namespace forms2{
 		continueLock = gcnew String("");
 		interruptLock = gcnew String("");
 		filePath = String::Copy(path);
+		saveFormat = gcnew String("aia");
 		continueImageLoop = false;
 		interruptImageLoop = false;
 		running = false;
@@ -199,6 +200,16 @@ namespace forms2{
 			Monitor::Exit(continueLock);
 		}
 	}
+	void CameraThread::setSaveFormat(String^ format){
+		//Monitor::Enter(saveFormat);
+		//try{
+			
+			saveFormat = String::Copy(format);
+		//}
+		//finally{
+		//	Monitor::Exit(saveFormat);
+		//}
+	}
 	bool CameraThread::getInterrupt(){
 		bool interruptTemp=false;
 		Monitor::Enter(interruptLock);
@@ -324,8 +335,9 @@ namespace forms2{
 				img->setSeqVars(seqVars);
 				seqVars->Clear();
 				//save
-				if (save) //saveImage(img);
-					img->saveFile(filePath,"dus");
+				if (save){ //saveImage(img);
+					img->saveFile(filePath,saveFormat);
+				}
 				//send the image to the main window
 				gotImage(img);
 				//saveImage(img);//(UInt16)rows*dbl,(UInt16)cols,(UInt16)layers,buf);
@@ -350,4 +362,6 @@ namespace forms2{
 			seqVars->AddLast(newvar);
 		}
 	}
+
+
 }

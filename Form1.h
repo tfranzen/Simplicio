@@ -281,6 +281,7 @@ namespace forms2{
 			this->formatListBox->RightToLeft = System::Windows::Forms::RightToLeft::No;
 			this->formatListBox->Size = System::Drawing::Size(136, 17);
 			this->formatListBox->TabIndex = 13;
+			this->formatListBox->SelectedIndexChanged += gcnew System::EventHandler(this, &Form1::formatListBox_SelectedIndexChanged);
 			// 
 			// initButton
 			// 
@@ -646,6 +647,7 @@ namespace forms2{
 	//	void takeImage(Object^ runloop);
 	//	void saveImage(UInt16 rows, UInt16 cols, UInt16 lays, UInt16 *buf);
 		void changePath();
+		void setSaveFormat(String^ Format);
 	//	void setProgressValue(int  value);
 	//	void setProgressValueDirectly(int  value);
 		void setDisplayImage(int stepsBack, int layer);
@@ -698,6 +700,9 @@ private: System::Void serverNameBox_KeyUp(System::Object^  sender, System::Windo
 			}
 		 }
 
+private: System::Void formatListBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
+			 setSaveFormat(getSaveFormat());
+		 }
 };
 }
 

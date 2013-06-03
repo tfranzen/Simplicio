@@ -26,6 +26,7 @@ namespace forms2{
 		void setSingleFrame(bool sf){singleFrame=sf;}
 		bool getSingleFrame() {return singleFrame;}
 		void setPath(String^ path);
+		void setSaveFormat(String^ format);
 		void setSave(bool saveFiles);
 		void setNextTime(DateTime nexttime);
 		void setSeqVars(LinkedList<Variable^>^ vars);
@@ -54,6 +55,7 @@ namespace forms2{
 		String^ filePath;
 		String^ continueLock;
 		String^ interruptLock;
+		String^ saveFormat;
 		
 		bool singleFrame;
 		bool running;

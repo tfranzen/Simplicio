@@ -54,6 +54,7 @@ namespace forms2{
 		camThread = gcnew CameraThread(this,getSavePath());
 		camThread->initCamera();
 		camThread->setSave(false);
+		camThread->setSaveFormat(getSaveFormat());
 		imgThread = gcnew ImageThread(this);
 		String^ sname = gcnew String("Simplicio Server");
 		setServerName(sname);
@@ -248,7 +249,9 @@ namespace forms2{
 		return folderLabel->Text;
 	}
 	String^ Form1::getSaveFormat(){
-		return formatListBox->SelectedItem->ToString();
+		String^ f = formatListBox->SelectedItem->ToString();
+		//if(f == NULL) return 'aia';
+		return f;
 	}
 	void Form1::saveImage(int stepsBack){
 		int bInd = getHistoryIndex(stepsBack);
@@ -618,115 +621,10 @@ namespace forms2{
 		camThread->setSeqVars(listvars);
 		acquire(false);
 	}
-	/*
-	void Form1::takeImage(Object^ runloop)
-	{	//takes an images
-		bool runLoop = (bool)runloop;
-		const int layers =(int)layersBox->Value;
-		//this.BeginInvokve(delegate//layersBox->Enabled = false);
-		//imageProgressBar->Maximum = layers;
-		CameraSettings camSet;
-		const int rows = camSet.getRows();
-		const int cols = camSet.getCols();
-		const int mode = camSet.getSetting(CameraSettings::MODE);
-		//const int typ = mode & 0x00FF;//byte 0
-		const int submode = (mode & 0xFF0000)>>16;//byte 2
-		const int dbl = (submode==QE_DOUBLE)? 2:1;
-		//const int rows2 = dbl*rows;
-		//MessageBox::Show(dbl.ToString(),"Box",MessageBoxButtons::OK);
-		
-		UInt16 *buf = (UInt16 *)malloc(2*dbl*cols*rows*layers);
-		if (buf==0){
-			MessageBox::Show("Buffer memory allocation failed.","Box",MessageBoxButtons::OK);
-			return;
-		}
-		bool runErr;
-		do{//loop for several images
-			int layersRead = 0;		
-			//imageProgressBar->Value = layersRead;//needs to use invoke
-			
-			//loop over each layer of the current image
-			for (int lay=0;lay<layers;lay++)
-			{
-				//STOP_COC(0);
-				RUN_COC(4);//expose the CCD once
-				int picstat;
-				int errS;
-				do{
-					errS=GET_IMAGE_STATUS(&picstat);
-					Thread::Sleep(0);
-				}while (errS==0 && ((picstat&0x02)!=0 || (dbl==4 && (picstat&16) == 0)) && !interruptImageLoop);
-				if (interruptImageLoop) break;
-				if (errS){
-					MessageBox::Show("Error while waiting for image","Box",MessageBoxButtons::OK); break;}
-				if((picstat&0x02)!=0){
-					MessageBox::Show("No image","Box",MessageBoxButtons::OK); break;}
-				//if (dbl==2 && (picstat&16) == 0)
-				//	MessageBox::Show("One buffer empty","Box",MessageBoxButtons::OK);
-			//	imageProgressBar->Value++;
+	
 
-				int width, height;
-				GET_IMAGE_SIZE(&width,&height);
-				if (width!=cols || height!=dbl*rows){
-					MessageBox::Show("Wrong dimensions in transfered image","Box",MessageBoxButtons::OK);break;}
-				else{				
-					int bufInd = lay*width*height;
-					READ_IMAGE_12BIT(0,width,height,buf+bufInd);
-					//STOP_COC(0);
-					layersRead++;
-					//imageProgressBar->Value = layersRead;
-					setProgressValue(layersRead);
-				}
-			}//end of layer for-loop
-			if (layersRead==layers)
-					//add: split double images, run save in new thread
-					saveImage((UInt16)rows*dbl,(UInt16)cols,(UInt16)layers,buf);
-			runErr = (layersRead!=layers);
-		}while(!runErr && continueImageLoop);
-		STOP_COC(0);
-		free(buf);
-		running=false;
-		//if (runErr) MessageBox::Show("Error","Box",MessageBoxButtons::OK);
-		//imageProgressBar->Value = 0;
-		layersBox->Enabled = true;//!!invoke
-		runIndicator->Checked = false;//!!!invoke
-		LOCK_DIALOG_CAM(0);
-	}
-	*/
-	/*
-	void Form1::saveImage(UInt16 rows, UInt16 cols, UInt16 layers, UInt16 *buf)
-	{	//saves a 16-bit AIA file in little endian
-		//MessageBox::Show("saveImage reached","Box",MessageBoxButtons::OK);
-		String^ extension = String::Concat(".",formatListBox->SelectedItem);//".aia";
-		String^ path = pathLink->Text;		
-		String^ basename = String::Concat(path,"\\data");//"data"
-		//MessageBox::Show(basename,"Box",MessageBoxButtons::OK);
-		String^ filename = String::Copy(basename);
-		for (int i=0; (i<1000) && File::Exists(String::Concat(filename,extension));i++){
-			filename = String::Concat(basename,i);
-		}
-		if (File::Exists(String::Concat(filename,extension))) return;
-		FileStream^ fs = File::Open(String::Concat(filename,extension),FileMode::Create);
-		BinaryWriter^ bw = gcnew BinaryWriter(fs);
-		try{
-			Byte b0 = 0x41;
-			Byte b1 = 0x49;
-			Byte b2 = 0x41;
-			bw->Write(b0);
-			bw->Write(b1);
-			bw->Write(b2);
-			UInt16 intLength = 2;
-			bw->Write(intLength);
-			bw->Write(rows);
-			bw->Write(cols);
-			bw->Write(layers);		
-			for (int i=0;i<rows*cols*layers;i++)
-				bw->Write(buf[i]);
-		}
-		finally{
-			bw->Close();
-			fs->Close();
-		}
-	}
-	*/
+	 void Form1::setSaveFormat(String^ Format){
+	   if(camThread != nullptr)
+		 camThread->setSaveFormat(getSaveFormat());
+   }
 }
