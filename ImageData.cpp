@@ -193,11 +193,14 @@ try{
 		for (int l(0); l<layers; l++){
 			FileStream^ bfs = File::Open(String::Format("{1}-{0:d2}.I16",l,filename),FileMode::Create);
 			BinaryWriter^ bw = gcnew BinaryWriter(bfs);
-
+			UInt16 d;
 			if (!(singleFrame && (l==0 || l > 3)))
 				for (int r(0);r<getRows();r++)
-					for (int c(0);c<getCols();c++)
-						bw->Write(getValue(r,c,l,0));
+					for (int c(0);c<getCols();c++){
+						d = getValue(r,c,l,0);
+						d = d>>8 | d<<8; //swap endianness
+						bw->Write(d); 
+					}
 
 		}
 
