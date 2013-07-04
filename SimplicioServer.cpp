@@ -101,9 +101,13 @@ namespace forms2{
 				count++;
 			}
 		}
-        array<Object^>^ parameters = gcnew array<Object^>(1);
+
+        array<Object^>^ parameters = gcnew array<Object^>(2);
 		parameters[0] = listVars;
+		parameters[1] = sequence->ListIterationNumber();
+
 		mainForm->BeginInvoke(seqStartedMainForm, parameters);
+
         return true;
     }
 

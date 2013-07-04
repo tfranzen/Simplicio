@@ -616,10 +616,14 @@ namespace forms2{
 	void Form1::setNextTime(DateTime nextTime){
 		camThread->setNextTime(nextTime);
 	}
-	void Form1::sequenceStarted(LinkedList<Variable^>^ listvars){
+	void Form1::sequenceStarted(LinkedList<Variable^>^ listvars, int iterNum){
 		//upcomingListVars = listvars;
 		camThread->setSeqVars(listvars);
 		acquire(false);
+		if(iterNum>0){ //list mode
+
+
+		}
 	}
 	
 

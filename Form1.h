@@ -593,7 +593,7 @@ namespace forms2{
 		void addImageData(ImageData^ img);
 		array<BufferedGraphics^>^ getEmptyBuffers(int numbuffers);
 		void addBuffers(array<BufferedGraphics^>^ newbuffers, int numbuffers,ImageData^ img);
-		void sequenceStarted(LinkedList<Variable^>^ listvars);
+		void sequenceStarted(LinkedList<Variable^>^ listvars,  int iterNum);
 		void setNextTime(DateTime nextTime);
 		bool isSingleFrame();
 		String^ getSaveFormat();
