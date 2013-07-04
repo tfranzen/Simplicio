@@ -282,11 +282,17 @@ namespace forms2{
 		do{//loop for several images
 			int layersRead = 0;		
 			readLayers(layersRead);
+			//only expose once for single frame download on apogee
+			if (singleFrame && driver.getDriverName() == "Apogee"){
+				driver->expose();
+			}
 			//loop over each layer of the current image
 			for (int lay=0;lay<layers;lay++)
 			{
-				//expose the CCD once
-				driver->expose();
+				//expose the CCD once for each frame, except for Apogee camera
+				if (!(singleFrame && driver.getDriverName() == "Apogee")){
+					driver->expose();
+				}
 				//int picstat;
 				//int errS;
 				int imgstatus;
@@ -326,9 +332,9 @@ namespace forms2{
 				int templayers=layers;
 				int temprows=rows;
 				
-				if (singleFrame){//hijacks existing code to implement this new feature
-					//templayers = 8;
-					//temprows = 128;
+				if (singleFrame && driver.getDriverName() == "Sensicam"){//hijacks existing code to implement this new feature
+					templayers = 8;
+					temprows = 128;
 				}
 				
 				ImageData^ img = gcnew ImageData(buf,temprows,cols,templayers,(dbl==2),singleFrame,datetime); 
