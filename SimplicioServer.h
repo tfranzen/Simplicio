@@ -29,13 +29,17 @@ namespace forms2{
         virtual void stop() override;
 
 	private:
-		delegate void DelegateVars(LinkedList<Variable^>^);
+		delegate void DelegateVars(LinkedList<Variable^>^,int,int,double);
 		delegate void DelegateTime(DateTime);
 
 		Form1^ mainForm;
 		DelegateTime^ setNextTimeMainForm;
 		DelegateVars^ seqStartedMainForm;
 		String^ serverName;
+
+		SettingsData^ mySettings;
+		SequenceData^ mySequence;
+		int triggerChannel;
 		//DateTime nextRunTime;
 	};
 }

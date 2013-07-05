@@ -10,7 +10,7 @@ namespace forms2{
 	using namespace System::Runtime::Remoting::Channels::Tcp;
 	SimplicioServer::SimplicioServer(Form1^ f){
 		mainForm=f;
-		serverName = gcnew String("Simplicio Server");
+		serverName = gcnew String("camera top");
 		setNextTimeMainForm = gcnew DelegateTime(f,&Form1::setNextTime);
 		seqStartedMainForm = gcnew DelegateVars(f,&Form1::sequenceStarted);
 		connect();	
@@ -102,17 +102,50 @@ namespace forms2{
 			}
 		}
 
-        array<Object^>^ parameters = gcnew array<Object^>(2);
+        
+
+		int triggerCount = 0;
+		double exptime = 0;
+		if(triggerChannel >-1){ //found a trigger Channel
+			for each(TimeStep^ ts in sequence->TimeSteps){ //now count timesteps where it is active
+				if(ts->StepEnabled){
+					if(ts->DigitalData[triggerChannel]->getValue())
+					{
+						triggerCount++;
+						if(exptime == 0)	exptime = ts->StepDuration->getBaseValue();
+					}
+					else if (ts->DigitalData[triggerChannel]->usesPulse())
+					{
+						if(exptime == 0)	exptime = ts->DigitalData[triggerChannel]->DigitalPulse->pulseDuration->getBaseValue();
+						triggerCount++;
+					}
+				}
+			}
+
+		}
+
+		array<Object^>^ parameters = gcnew array<Object^>(4);
 		parameters[0] = listVars;
-		parameters[1] = sequence->ListIterationNumber();
-
+		parameters[1] = sequence->ListIterationNumber;
+		parameters[2] = triggerCount;
+		parameters[3] = exptime;
 		mainForm->BeginInvoke(seqStartedMainForm, parameters);
-
+		mySequence = sequence;
         return true;
     }
 
     bool SimplicioServer::setSettings(SettingsData^ settings)
     {
+		mySettings = settings;
+		Dictionary<int,LogicalChannel^>^ dc = settings->logicalChannelManager->Digitals;
+		triggerChannel = -1;
+		for each (int i in dc->Keys){
+			if(dc[i]->Name == serverName){
+				// found trigger Channel
+				triggerChannel = i;
+
+			}
+		}
         return true;
     }
 

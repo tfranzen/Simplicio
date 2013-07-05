@@ -91,6 +91,8 @@ namespace forms2{
 	private: System::Windows::Forms::CheckBox^  normalizeCheckbox;
 	private: System::Windows::Forms::CheckBox^  falseColorCheckbox;
 	private: System::Windows::Forms::NumericUpDown^  scaleMaxField;
+	private: System::Windows::Forms::Label^  trigLabel;
+
 
 
 
@@ -149,6 +151,7 @@ namespace forms2{
 			this->serverNameBox = (gcnew System::Windows::Forms::TextBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->currentServerNameLabel = (gcnew System::Windows::Forms::Label());
+			this->trigLabel = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->layersBox))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBox))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->zoomBox))->BeginInit();
@@ -185,6 +188,7 @@ namespace forms2{
 			this->layersBox->Size = System::Drawing::Size(35, 20);
 			this->layersBox->TabIndex = 2;
 			this->layersBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {3, 0, 0, 0});
+			this->layersBox->ValueChanged += gcnew System::EventHandler(this, &Form1::layersBox_ValueChanged);
 			// 
 			// layersLabel
 			// 
@@ -466,10 +470,10 @@ namespace forms2{
 			this->folderLabel->AutoSize = true;
 			this->folderLabel->Location = System::Drawing::Point(68, 13);
 			this->folderLabel->Name = L"folderLabel";
-			this->folderLabel->Size = System::Drawing::Size(347, 13);
+			this->folderLabel->Size = System::Drawing::Size(41, 13);
 			this->folderLabel->TabIndex = 26;
 			this->folderLabel->TabStop = true;
-			this->folderLabel->Text = L"C:\\Documents and Settings\\Lithium\\My Documents\\Online Fitting\\2012";
+			this->folderLabel->Text = L"I:\\Data";
 			this->folderLabel->Click += gcnew System::EventHandler(this, &Form1::pathClicked);
 			// 
 			// cameraLabel
@@ -539,11 +543,22 @@ namespace forms2{
 			this->currentServerNameLabel->TabIndex = 33;
 			this->currentServerNameLabel->Text = L"name";
 			// 
+			// trigLabel
+			// 
+			this->trigLabel->AutoSize = true;
+			this->trigLabel->Location = System::Drawing::Point(41, 916);
+			this->trigLabel->Name = L"trigLabel";
+			this->trigLabel->Size = System::Drawing::Size(98, 13);
+			this->trigLabel->TabIndex = 34;
+			this->trigLabel->Text = L"No sequence data.";
+			this->trigLabel->Click += gcnew System::EventHandler(this, &Form1::label2_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1259, 981);
+			this->Controls->Add(this->trigLabel);
 			this->Controls->Add(this->currentServerNameLabel);
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->serverNameBox);
@@ -593,9 +608,10 @@ namespace forms2{
 		void addImageData(ImageData^ img);
 		array<BufferedGraphics^>^ getEmptyBuffers(int numbuffers);
 		void addBuffers(array<BufferedGraphics^>^ newbuffers, int numbuffers,ImageData^ img);
-		void sequenceStarted(LinkedList<Variable^>^ listvars,  int iterNum);
+		void sequenceStarted(LinkedList<Variable^>^ listvars,  int iterNum, int trigCount, double exptime);
 		void setNextTime(DateTime nextTime);
 		bool isSingleFrame();
+	
 		String^ getSaveFormat();
 		bool isFalseColor();
 		bool isNormalized();
@@ -610,6 +626,9 @@ namespace forms2{
 		bool running;
 		bool continueImageLoop;
 		bool interruptImageLoop;
+		bool listmode;
+		int listIterNum;
+		int prevListIterNum;
 		String^ filePath;
 		//UInt16 layers;
 		//CameraSettings camSet;
@@ -702,6 +721,32 @@ private: System::Void serverNameBox_KeyUp(System::Object^  sender, System::Windo
 
 private: System::Void formatListBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e) {
 			 setSaveFormat(getSaveFormat());
+		 }
+private: System::Void label2_Click(System::Object^  sender, System::EventArgs^  e) {
+		 }
+private: System::Void layersBox_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
+
+			 // update entries in frame selector
+			 int layers = (int) layersBox->Value;
+			 this->frameListBox->Items->Clear();
+			 cli::array< System::Object^  >^ fluor = gcnew cli::array< System::Object^  >(3) {L"Fluorescence Image", L"Bright Frame", L"DarkFrame"};
+			 cli::array< System::Object^  >^ absor = gcnew cli::array< System::Object^  >(4) {L"Absorption Image", L"Probe With Atoms", L"Probe Without Atoms", 
+				L"Dark Field"};
+
+			 switch(layers){
+			 case 1:
+				 this->frameListBox->Items->Add(L"Single Image");
+				 break;
+			 case 2: 
+				  this->frameListBox->Items->AddRange(fluor);
+				  break;
+			 case 3: 
+				  this->frameListBox->Items->AddRange(absor);
+				  break;
+			 default:
+				 for(int i =0;i<layers; i++)
+					 this->frameListBox->Items->Add(String::Format("Frame {0}",i+1));
+			 }
 		 }
 };
 }

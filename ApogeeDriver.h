@@ -26,7 +26,8 @@ namespace forms2{
 		virtual void readImage(UInt16 *buffer) override;
 		virtual String^ getDriverName() override {return gcnew String("Apogee");}
 		virtual int armCamera() override;
-
+		virtual void setExposure(double exptime) override;
+		virtual void setLayers(int layers) override;
 		//settings
 		virtual int getRows() override;
 		virtual int getCols() override;
@@ -34,7 +35,6 @@ namespace forms2{
 		virtual void update() override;
 
 		double getExposure();
-		void setExposure(double exptime);
 
 		int getFrames();
 		void setFrames(int frames);

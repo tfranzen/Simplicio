@@ -33,7 +33,7 @@ namespace forms2{
 		void closeCamera();
 		int changeCamera(String^ camname);
 		String^ getCameraDriverName();
-		
+		void setExposure(double exptime);
 		static const int CAM_NOT_CHANGED = 1;
 		
 	private:
@@ -77,6 +77,7 @@ namespace forms2{
 		void finishedRunning();
 		void readLayers(int layersRead);
 		void gotImage(ImageData^ img);
+		
 		//void saveImage(ImageData^ img);//UInt16 rows, UInt16 cols, UInt16 lays, UInt16 *buf);
 		
 	};

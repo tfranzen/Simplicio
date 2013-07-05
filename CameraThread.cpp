@@ -261,6 +261,7 @@ namespace forms2{
 	void CameraThread::takeImages(Object^ layersObj)
 	{
 		const int layers = (int)layersObj;
+		if(singleFrame)	driver->setLayers(layers);
 		driver->lockCameraDialog(true);
 		driver->armCamera();
 		running=true;
@@ -283,14 +284,14 @@ namespace forms2{
 			int layersRead = 0;		
 			readLayers(layersRead);
 			//only expose once for single frame download on apogee
-			if (singleFrame && driver.getDriverName() == "Apogee"){
+			if (singleFrame && driver->getDriverName() == "Apogee"){
 				driver->expose();
 			}
 			//loop over each layer of the current image
 			for (int lay=0;lay<layers;lay++)
 			{
 				//expose the CCD once for each frame, except for Apogee camera
-				if (!(singleFrame && driver.getDriverName() == "Apogee")){
+				if (!(singleFrame && driver->getDriverName() == "Apogee")){
 					driver->expose();
 				}
 				//int picstat;
@@ -332,7 +333,7 @@ namespace forms2{
 				int templayers=layers;
 				int temprows=rows;
 				
-				if (singleFrame && driver.getDriverName() == "Sensicam"){//hijacks existing code to implement this new feature
+				if (singleFrame && driver->getDriverName() == "Sensicam"){//hijacks existing code to implement this new feature
 					templayers = 8;
 					temprows = 128;
 				}
@@ -369,5 +370,9 @@ namespace forms2{
 		}
 	}
 
+	void CameraThread::setExposure(double exptime){
+		if(driver)
+			driver->setExposure(exptime);
 
+	}
 }

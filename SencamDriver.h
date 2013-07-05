@@ -20,6 +20,8 @@ namespace forms2{
 		virtual void readImage(UInt16 *buffer) override;
 		virtual String^ getDriverName() override {return gcnew String("Sensicam");}
 		virtual int armCamera() override;
+		virtual void setExposure(double exptime) override;
+		virtual void setLayers(int layers) override;
 
 		//settings
 		virtual int getRows() override;

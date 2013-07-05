@@ -22,7 +22,7 @@ namespace forms2{
 		hbin = NULL_SETTING;
 		vbin = NULL_SETTING;*/
 		AltaCamera = new ICamera2Ptr;
-		framesPerImage = 2;
+		framesPerImage = 1;
 		exposure_time = 0.001;
 		triggered = false;
 	}
@@ -214,7 +214,7 @@ namespace forms2{
 		if((AltaCamera == NULL) || (*AltaCamera == NULL) ){
 			return 0;
 		}
-		return (*AltaCamera)->ImageCount * (*AltaCamera)->RoiPixelsV;
+		return (*AltaCamera)->RoiPixelsV; //(*AltaCamera)->ImageCount * 
 	}
 	void ApogeeDriver::readImage(UInt16 *buffer){
 		if((AltaCamera != NULL) && (*AltaCamera != NULL) ){
@@ -290,5 +290,9 @@ namespace forms2{
 
 	bool ApogeeDriver::getTrigger(){
 		return triggered;
+	}
+
+	void ApogeeDriver::setLayers(int layers){
+		setFrames(layers);
 	}
 }

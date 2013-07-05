@@ -1,1 +1,4 @@
-savefolder=D:\Data\2012\2012-09
+savefolder=I:\Data
+servername=camera top
+camera=Apogee
+saveformat=dus

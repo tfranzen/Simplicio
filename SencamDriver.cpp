@@ -142,4 +142,12 @@ namespace forms2{
 		hbin = _hbin;
 		vbin = _vbin;
 	}
+
+	void SencamDriver::setExposure(double exptime){
+		
+	}
+
+	void SencamDriver::setLayers(int layers){
+		
+	}
 }

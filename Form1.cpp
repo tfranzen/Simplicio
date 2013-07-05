@@ -47,7 +47,7 @@ namespace forms2{
 		imgDataIndex = -1;
 		displayedImgInd = 0;
 		displayedLayer = 0;
-		
+		listmode = false;
 		//imgData = nullptr;
 		//imgDataStack = gcnew Stack(10);
 		server = gcnew SimplicioServer(this);
@@ -60,6 +60,8 @@ namespace forms2{
 		setServerName(sname);
 		serverNameBox->Text = sname;
 		cameraNameLabel->Text = camThread->getCameraDriverName();
+
+		layersBox->Value=1;
 
 		//Load default folder name
 		String^ foldername;
@@ -74,8 +76,37 @@ namespace forms2{
 					int ind = line->IndexOf('=');
 					foldername = line->Remove(0,ind+1);
 					folderLabel->Text =  foldername;
-					line = nullptr;
+					//line = nullptr;
 				}
+				else if (line->Contains("servername"))
+				{
+					int ind = line->IndexOf('=');
+					sname = line->Remove(0,ind+1);
+					setServerName(sname);
+					serverNameBox->Text = sname;
+					//line = nullptr;
+				}
+				else if (line->Contains("camera"))
+				{
+					int ind = line->IndexOf('=');
+					String^ cname = line->Remove(0,ind+1);
+					int i = cameraListBox->FindStringExact(cname);
+					if( i != ListBox::NoMatches){
+						cameraListBox->SelectedIndex = i;
+						changeCamera();
+					}
+				}
+				else if (line->Contains("saveformat"))
+				{
+					int ind = line->IndexOf('=');
+					String^ fname = line->Remove(0,ind+1);
+					int i = formatListBox->FindStringExact(fname);
+					if( i != ListBox::NoMatches){
+						formatListBox->SelectedIndex = i;
+						
+					}
+				}
+				
 			} while (line!=nullptr);
 			sr->Close();
 			fs->Close();
@@ -616,14 +647,42 @@ namespace forms2{
 	void Form1::setNextTime(DateTime nextTime){
 		camThread->setNextTime(nextTime);
 	}
-	void Form1::sequenceStarted(LinkedList<Variable^>^ listvars, int iterNum){
+	void Form1::sequenceStarted(LinkedList<Variable^>^ listvars, int iterNum, int trigCount, double exptime){
 		//upcomingListVars = listvars;
 		camThread->setSeqVars(listvars);
 		acquire(false);
-		if(iterNum>0){ //list mode
 
+		if(trigCount>0){ // autodetected number of images and exposure time
+			trigLabel->Text = String::Format("Autodetected {0} triggers, exposure time {1} s.", trigCount,exptime);
+			layersBox->Value = trigCount;
+			camThread->setExposure(exptime*1000.0);
+		}
+		else
+		{
+			trigLabel->Text = "No Triggers.";
+		}	
+
+		
+
+		listIterNum = iterNum;
+		if(iterNum>0){ //list mode
+			if((listmode == false) || (listIterNum < prevListIterNum))
+			{
+				saveCheckBox->Checked = true;
+				listmode = true;
+				// add code to start new image directory
+			}
 
 		}
+		else
+		{	
+			if(listmode == true)
+			{
+				saveCheckBox->Checked = false;
+				listmode = false;
+			}
+		}
+		prevListIterNum = iterNum;
 	}
 	
 
@@ -631,4 +690,5 @@ namespace forms2{
 	   if(camThread != nullptr)
 		 camThread->setSaveFormat(getSaveFormat());
    }
+	
 }

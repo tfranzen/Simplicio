@@ -165,6 +165,15 @@ namespace forms2{
 		return false;
 	}
 	void WinXDriver::update(){}
+
+	void WinXDriver::setExposure(double exptime){
+		
+	}
+
+	void WinXDriver::setLayers(int layers){
+		
+	}
+
 	void WinXDriver::getSettings()
 	{
 		short stat;
