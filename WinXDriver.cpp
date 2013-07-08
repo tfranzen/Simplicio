@@ -166,7 +166,7 @@ namespace forms2{
 	}
 	void WinXDriver::update(){}
 
-	void WinXDriver::setExposure(double exptime){
+	void WinXDriver::setExposure(double exptime,bool triggered){
 		
 	}
 

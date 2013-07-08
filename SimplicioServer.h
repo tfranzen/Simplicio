@@ -31,10 +31,13 @@ namespace forms2{
 	private:
 		delegate void DelegateVars(LinkedList<Variable^>^,int,int,double);
 		delegate void DelegateTime(DateTime);
+		delegate void DelegateE(void);
 
 		Form1^ mainForm;
 		DelegateTime^ setNextTimeMainForm;
 		DelegateVars^ seqStartedMainForm;
+
+		DelegateE^ seqEndedMainForm;
 		String^ serverName;
 
 		SettingsData^ mySettings;

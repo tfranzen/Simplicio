@@ -9,7 +9,6 @@ namespace forms2 {
 			ExposureBox->Value = System::Decimal(driver->getExposure());
 			framesperimage->Value = System::Decimal(driver->getFrames());
 
-			triggerCheckbox->Checked = driver->getTrigger();
 
 			roix1->Maximum = 639;
 			roix2->Maximum = 639;

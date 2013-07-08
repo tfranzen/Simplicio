@@ -11,7 +11,7 @@ namespace forms2{
 		virtual int openCameraDialog(){return 0;}
 		virtual void lockCameraDialog(bool lock){}
 		virtual void closeCamera()=0;
-		virtual void setExposure(double exptime)=0;
+		virtual void setExposure(double exptime,bool triggered)=0;
 		virtual void setLayers(int layers)=0;
 		virtual void expose()=0;
 		virtual void stop()=0;//stops acquistion

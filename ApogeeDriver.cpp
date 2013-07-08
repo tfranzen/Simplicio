@@ -251,8 +251,9 @@ namespace forms2{
 	}
 
 
-	void ApogeeDriver::setExposure(double exptime){
+	void ApogeeDriver::setExposure(double exptime,bool trigger){
 		exposure_time = exptime/1000;
+		triggered = trigger;
 	}
 
 	double ApogeeDriver::getExposure(){

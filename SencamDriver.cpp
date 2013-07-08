@@ -143,7 +143,7 @@ namespace forms2{
 		vbin = _vbin;
 	}
 
-	void SencamDriver::setExposure(double exptime){
+	void SencamDriver::setExposure(double exptime,bool triggered){
 		
 	}
 

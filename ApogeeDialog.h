@@ -55,7 +55,7 @@ protected:
 	private: System::Windows::Forms::NumericUpDown^  roiy1;
 	private: System::Windows::Forms::NumericUpDown^  roiy2;
 	private: System::Windows::Forms::Button^  applyROI;
-	private: System::Windows::Forms::CheckBox^  triggerCheckbox;
+
 	private: System::Windows::Forms::Label^  label4;
 	private: System::Windows::Forms::Label^  label5;
 
@@ -87,7 +87,6 @@ protected:
 			this->roiy1 = (gcnew System::Windows::Forms::NumericUpDown());
 			this->roiy2 = (gcnew System::Windows::Forms::NumericUpDown());
 			this->applyROI = (gcnew System::Windows::Forms::Button());
-			this->triggerCheckbox = (gcnew System::Windows::Forms::CheckBox());
 			this->label4 = (gcnew System::Windows::Forms::Label());
 			this->label5 = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->ExposureBox))->BeginInit();
@@ -220,17 +219,6 @@ protected:
 			this->applyROI->UseVisualStyleBackColor = true;
 			this->applyROI->Click += gcnew System::EventHandler(this, &ApogeeDialog::applyROI_Click);
 			// 
-			// triggerCheckbox
-			// 
-			this->triggerCheckbox->AutoSize = true;
-			this->triggerCheckbox->Location = System::Drawing::Point(31, 298);
-			this->triggerCheckbox->Name = L"triggerCheckbox";
-			this->triggerCheckbox->Size = System::Drawing::Size(100, 17);
-			this->triggerCheckbox->TabIndex = 16;
-			this->triggerCheckbox->Text = L"External Trigger";
-			this->triggerCheckbox->UseVisualStyleBackColor = true;
-			this->triggerCheckbox->CheckedChanged += gcnew System::EventHandler(this, &ApogeeDialog::triggerCheckbox_CheckedChanged);
-			// 
 			// label4
 			// 
 			this->label4->AutoSize = true;
@@ -256,7 +244,6 @@ protected:
 			this->ClientSize = System::Drawing::Size(231, 333);
 			this->Controls->Add(this->label5);
 			this->Controls->Add(this->label4);
-			this->Controls->Add(this->triggerCheckbox);
 			this->Controls->Add(this->applyROI);
 			this->Controls->Add(this->roiy2);
 			this->Controls->Add(this->roiy1);
@@ -293,7 +280,7 @@ protected:
 			 
 private: System::Void ExposureBox_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
 			 
-				 cameraDriver->setExposure(double(ExposureBox->Value));
+				 cameraDriver->setExposure(double(ExposureBox->Value),cameraDriver->getTrigger());
 			 
 		 }
 private: System::Void TempButton_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -326,9 +313,6 @@ private: System::Void applyROI_Click(System::Object^  sender, System::EventArgs^
 		 }
 private: System::Void framesperimage_ValueChanged(System::Object^  sender, System::EventArgs^  e) {
 			 cameraDriver->setFrames(int(framesperimage->Value));
-		 }
-private: System::Void triggerCheckbox_CheckedChanged(System::Object^  sender, System::EventArgs^  e) {
-			 cameraDriver->setTrigger(triggerCheckbox->Checked);
 		 }
 };
 }

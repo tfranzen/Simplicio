@@ -13,6 +13,7 @@ namespace forms2{
 		serverName = gcnew String("camera top");
 		setNextTimeMainForm = gcnew DelegateTime(f,&Form1::setNextTime);
 		seqStartedMainForm = gcnew DelegateVars(f,&Form1::sequenceStarted);
+		seqEndedMainForm = gcnew DelegateE(f,&Form1::sequenceEnded);
 		connect();	
 	}
 	void SimplicioServer::connect(){
@@ -84,7 +85,8 @@ namespace forms2{
 
     bool SimplicioServer::runSuccess()
     {
-       return true;
+       mainForm->BeginInvoke(seqEndedMainForm,gcnew array<Object^>(0));
+		return true;
     }
 
     bool SimplicioServer::setSequence(SequenceData^ sequence)

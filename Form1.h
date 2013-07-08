@@ -92,6 +92,10 @@ namespace forms2{
 	private: System::Windows::Forms::CheckBox^  falseColorCheckbox;
 	private: System::Windows::Forms::NumericUpDown^  scaleMaxField;
 	private: System::Windows::Forms::Label^  trigLabel;
+	private: System::Windows::Forms::Label^  subfolderLabel;
+	private: System::Windows::Forms::Button^  newSequenceButton;
+	private: System::Windows::Forms::CheckBox^  triggerCheckbox;
+
 
 
 
@@ -152,6 +156,9 @@ namespace forms2{
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->currentServerNameLabel = (gcnew System::Windows::Forms::Label());
 			this->trigLabel = (gcnew System::Windows::Forms::Label());
+			this->subfolderLabel = (gcnew System::Windows::Forms::Label());
+			this->newSequenceButton = (gcnew System::Windows::Forms::Button());
+			this->triggerCheckbox = (gcnew System::Windows::Forms::CheckBox());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->layersBox))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBox))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->zoomBox))->BeginInit();
@@ -508,7 +515,7 @@ namespace forms2{
 			// singleFrameCheckBox
 			// 
 			this->singleFrameCheckBox->AutoSize = true;
-			this->singleFrameCheckBox->Location = System::Drawing::Point(223, 246);
+			this->singleFrameCheckBox->Location = System::Drawing::Point(223, 237);
 			this->singleFrameCheckBox->Name = L"singleFrameCheckBox";
 			this->singleFrameCheckBox->Size = System::Drawing::Size(84, 17);
 			this->singleFrameCheckBox->TabIndex = 30;
@@ -553,11 +560,44 @@ namespace forms2{
 			this->trigLabel->Text = L"No sequence data.";
 			this->trigLabel->Click += gcnew System::EventHandler(this, &Form1::label2_Click);
 			// 
+			// subfolderLabel
+			// 
+			this->subfolderLabel->AutoSize = true;
+			this->subfolderLabel->Location = System::Drawing::Point(92, 37);
+			this->subfolderLabel->Name = L"subfolderLabel";
+			this->subfolderLabel->Size = System::Drawing::Size(55, 13);
+			this->subfolderLabel->TabIndex = 35;
+			this->subfolderLabel->Text = L"Subfolder:";
+			// 
+			// newSequenceButton
+			// 
+			this->newSequenceButton->Location = System::Drawing::Point(270, 30);
+			this->newSequenceButton->Name = L"newSequenceButton";
+			this->newSequenceButton->Size = System::Drawing::Size(99, 20);
+			this->newSequenceButton->TabIndex = 36;
+			this->newSequenceButton->Text = L"New Sequence";
+			this->newSequenceButton->UseVisualStyleBackColor = true;
+			this->newSequenceButton->Click += gcnew System::EventHandler(this, &Form1::newSequenceButton_Click);
+			// 
+			// triggerCheckbox
+			// 
+			this->triggerCheckbox->AutoSize = true;
+			this->triggerCheckbox->Enabled = false;
+			this->triggerCheckbox->Location = System::Drawing::Point(223, 254);
+			this->triggerCheckbox->Name = L"triggerCheckbox";
+			this->triggerCheckbox->Size = System::Drawing::Size(71, 17);
+			this->triggerCheckbox->TabIndex = 37;
+			this->triggerCheckbox->Text = L"Triggered";
+			this->triggerCheckbox->UseVisualStyleBackColor = true;
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1259, 981);
+			this->Controls->Add(this->triggerCheckbox);
+			this->Controls->Add(this->newSequenceButton);
+			this->Controls->Add(this->subfolderLabel);
 			this->Controls->Add(this->trigLabel);
 			this->Controls->Add(this->currentServerNameLabel);
 			this->Controls->Add(this->label1);
@@ -604,11 +644,13 @@ namespace forms2{
 	public:
 		void setLayersRead(int value);
 		void loopFinished();
+		void newSequence(DateTime t);
 		void pictureBox_Paint(Object^ /*sender*/, System::Windows::Forms::PaintEventArgs^ e );
 		void addImageData(ImageData^ img);
 		array<BufferedGraphics^>^ getEmptyBuffers(int numbuffers);
 		void addBuffers(array<BufferedGraphics^>^ newbuffers, int numbuffers,ImageData^ img);
 		void sequenceStarted(LinkedList<Variable^>^ listvars,  int iterNum, int trigCount, double exptime);
+		void sequenceEnded();
 		void setNextTime(DateTime nextTime);
 		bool isSingleFrame();
 	
@@ -627,6 +669,8 @@ namespace forms2{
 		bool continueImageLoop;
 		bool interruptImageLoop;
 		bool listmode;
+		bool wasLooped;
+		double manualExpTime;
 		int listIterNum;
 		int prevListIterNum;
 		String^ filePath;
@@ -747,6 +791,9 @@ private: System::Void layersBox_ValueChanged(System::Object^  sender, System::Ev
 				 for(int i =0;i<layers; i++)
 					 this->frameListBox->Items->Add(String::Format("Frame {0}",i+1));
 			 }
+		 }
+private: System::Void newSequenceButton_Click(System::Object^  sender, System::EventArgs^  e) {
+			 newSequence(DateTime::Now);
 		 }
 };
 }

@@ -33,9 +33,9 @@ namespace forms2{
 		void closeCamera();
 		int changeCamera(String^ camname);
 		String^ getCameraDriverName();
-		void setExposure(double exptime);
+		void setExposure(double exptime,bool triggered);
 		static const int CAM_NOT_CHANGED = 1;
-		
+		bool getContinue();
 	private:
 		
 		delegate void DelegateInt(int value);
@@ -69,7 +69,7 @@ namespace forms2{
 		static DateTime NO_TIME = DateTime(1,1,1);
 		
 		void init(Form1^ f, String^ path);
-		bool getContinue();
+		
 		void setContinue(bool c);
 		bool getInterrupt();
 		void setInterrupt(bool c);

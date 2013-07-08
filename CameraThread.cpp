@@ -370,9 +370,10 @@ namespace forms2{
 		}
 	}
 
-	void CameraThread::setExposure(double exptime){
+	void CameraThread::setExposure(double exptime,bool triggered){
 		if(driver)
-			driver->setExposure(exptime);
-
+		{
+			driver->setExposure(exptime,triggered);
+		}
 	}
 }

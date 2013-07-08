@@ -86,7 +86,7 @@ namespace forms2{
 		hbin = 1;
 		vbin = 1;			
 	}
-	void TestDriver::setExposure(double exptime){
+	void TestDriver::setExposure(double exptime,bool triggered){
 		
 	}
 	void TestDriver::setLayers(int layers){

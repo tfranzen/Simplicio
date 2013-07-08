@@ -48,6 +48,9 @@ namespace forms2{
 		displayedImgInd = 0;
 		displayedLayer = 0;
 		listmode = false;
+
+
+		manualExpTime = 0.005;
 		//imgData = nullptr;
 		//imgDataStack = gcnew Stack(10);
 		server = gcnew SimplicioServer(this);
@@ -543,7 +546,7 @@ namespace forms2{
 		System::Windows::Forms::DialogResult result = folderBrowserDialog->ShowDialog();
 		if ( result == System::Windows::Forms::DialogResult::OK ){
 			folderLabel->Text = folderBrowserDialog->SelectedPath;
-			camThread->setPath(folderLabel->Text);
+			newSequence(DateTime::Now);
 		}
 	}
 	
@@ -647,15 +650,36 @@ namespace forms2{
 	void Form1::setNextTime(DateTime nextTime){
 		camThread->setNextTime(nextTime);
 	}
+
+
+	void Form1::sequenceEnded(){
+		camThread->setExposure(manualExpTime,false);
+		triggerCheckbox->Checked = false;
+		layersBox->Value = 1;
+
+		if(wasLooped){
+			// restart loop
+			acquire(true);			
+		}
+	}
+
+
 	void Form1::sequenceStarted(LinkedList<Variable^>^ listvars, int iterNum, int trigCount, double exptime){
 		//upcomingListVars = listvars;
+		wasLooped = camThread->getContinue();
+		if(wasLooped){
+			// currently looping
+			interrupt(true);			
+		}
+		
 		camThread->setSeqVars(listvars);
 		acquire(false);
 
 		if(trigCount>0){ // autodetected number of images and exposure time
 			trigLabel->Text = String::Format("Autodetected {0} triggers, exposure time {1} s.", trigCount,exptime);
 			layersBox->Value = trigCount;
-			camThread->setExposure(exptime*1000.0);
+			camThread->setExposure(exptime*1000.0,true);
+			triggerCheckbox->Checked = true;
 		}
 		else
 		{
@@ -690,5 +714,13 @@ namespace forms2{
 	   if(camThread != nullptr)
 		 camThread->setSaveFormat(getSaveFormat());
    }
+
+	 void Form1::newSequence(DateTime t){
+		 String^ subfolder = t.ToString("yyyy-MM-dd\\HH-mm-ss");
+		 subfolderLabel->Text = subfolder;
+		 System::IO::Directory::CreateDirectory(getSavePath() + "\\" + subfolder);
+		 if(camThread != nullptr)
+			camThread->setPath( getSavePath() + "\\" + subfolder);
+	 }
 	
 }
