@@ -108,14 +108,14 @@ namespace forms2{
 		array<Bitmap^>^ bitmaps = gcnew array<Bitmap^>(numBuffers);
 		array<BitmapData^>^ bmpData = gcnew array<BitmapData^>(numBuffers);
 		for(int i(0);i<numBuffers;i++){
-			bitmaps[i]=gcnew Bitmap(cols,rows,PixelFormat::Format32bppArgb);
+			bitmaps[i]=gcnew Bitmap(cols*pixelSize,rows*pixelSize,PixelFormat::Format32bppArgb);
 			bmpData[i] = bitmaps[i]->LockBits(rect,Imaging::ImageLockMode::ReadWrite,bitmaps[i]->PixelFormat);
 		}
 
 		//create value arrays
 		int bytesPerPixel = 4;  
 		int stride=bmpData[0]->Stride;//bytes per row
-		int bytes = stride * rows;//bytes per layer
+		int bytes = stride * rows*pixelSize/binSize;//bytes per layer
 		array<array<Byte>^>^ bmpValues = gcnew array<array<Byte>^>(numBuffers);
 		for (int i=0;i<numBuffers;i++){
 			bmpValues[i] = gcnew array<Byte>(bytes);
@@ -154,13 +154,19 @@ namespace forms2{
 					if (makePreview) bufLay++;//make space for preview layer
 					x = pixelSize*c/binSize;
 					y = pixelSize*r/binSize;
-					if(useFalseColor){					
-						for (int rgb=0;rgb<4;rgb++)
-							bmpValues[bufLay][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
-					}
-					else{
-						for (int rgb=0;rgb<4;rgb++)
-							bmpValues[bufLay][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:value;
+
+					for(int dx=0;dx<pixelSize;dx++){
+						for(int dy=0;dy<pixelSize;dy++){
+							if(useFalseColor){					
+								for (int rgb=0;rgb<4;rgb++)
+									bmpValues[bufLay][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+							}
+							else{
+								for (int rgb=0;rgb<4;rgb++){
+									bmpValues[bufLay][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:value;
+								}
+							}
+						}
 					}
 					//bitmaps[bufLay]->SetPixel(pixelSize*c/binSize,pixelSize*r/binSize,Color::FromArgb(value,value,value));
 					//buffers[bufLay]->Graphics->FillRectangle(brush,Rectangle(pixelSize*c/binSize,pixelSize*r/binSize,pixelSize,pixelSize));
@@ -196,13 +202,17 @@ namespace forms2{
 						value = (int)ratio;
 						x = pixelSize*c/binSize;
 						y = pixelSize*r/binSize;
+						for(int dx=0;dx<pixelSize;dx++){
+						for(int dy=0;dy<pixelSize;dy++){
 						if(useFalseColor){					
 							for (int rgb=0;rgb<4;rgb++)
-								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+								bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
 						}
 						else{
 							for (int rgb=0;rgb<4;rgb++)
-								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:value;
+								bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:value;
+						}
+						}
 						}
 						//bitmaps[0]->SetPixel(pixelSize*c/binSize,pixelSize*r/binSize,Color::FromArgb(value,value,value));
 						//brush->Color = Color::FromArgb(value,value,value);
@@ -229,14 +239,18 @@ namespace forms2{
 						value = min(255,(int)ratio);
 						x = pixelSize*c/binSize;
 						y = pixelSize*r/binSize;
+						for(int dx=0;dx<pixelSize;dx++){
+						for(int dy=0;dy<pixelSize;dy++){
 						if(useFalseColor){					
 							for (int rgb=0;rgb<4;rgb++)
-								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+								bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
 						}
 						else{
 							for (int rgb=0;rgb<4;rgb++)
-								bmpValues[0][y*stride+bytesPerPixel*x+rgb] = (rgb==3)? 255:value;
-						}						
+								bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:value;
+						}			
+						}
+						}
 						Ncount += value * binSize * binSize;		
 				}//end of layers==2
 			}//end for loop on c

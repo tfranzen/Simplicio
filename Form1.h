@@ -462,7 +462,7 @@ namespace forms2{
 			this->pixelSizeBox->Name = L"pixelSizeBox";
 			this->pixelSizeBox->Size = System::Drawing::Size(32, 20);
 			this->pixelSizeBox->TabIndex = 23;
-			this->pixelSizeBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {1, 0, 0, 0});
+			this->pixelSizeBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {2, 0, 0, 0});
 			// 
 			// saveCheckBox
 			// 

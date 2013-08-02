@@ -653,7 +653,7 @@ namespace forms2{
 		layersBox->Enabled = true;
 		exposureBox->Enabled = true;
 		triggerCheckbox->Enabled = true;
-		layersBox->Value = newLayerCount;
+		//layersBox->Value = newLayerCount;
 		runIndicator->Checked = false;
 		/*if(restart){
 			restart = false;
