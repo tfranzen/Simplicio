@@ -88,6 +88,12 @@ namespace forms2{
 			Discover->SelectedCamIdTwo,
 			0x0 );
 
+		/*hr = (*AltaCamera)->Init( Apn_Interface_USB, 
+			0,
+			0,
+			0x0 );*/
+
+
 		roix1 = 100;
 		roix2 = 400;
 		roiy1 = 100;
@@ -99,10 +105,20 @@ namespace forms2{
 		(*AltaCamera)->RoiPixelsV = roiy2-roiy1;
 
 		
+		(*AltaCamera)->LedMode = Apn_LedMode_EnableAll; 
+		(*AltaCamera)->LedA = Apn_LedState_ExtTriggerWaiting; 
+		(*AltaCamera)->LedB = Apn_LedState_Flushing;
 
+		//(*AltaCamera)->DualReadout = true;
+		
+
+		(*AltaCamera)->DigitizationSpeed = 1; // 1 ist fast
 		(*AltaCamera)->SequenceBulkDownload = true;
 		(*AltaCamera)->ImageCount = framesPerImage;
 
+		System::Diagnostics::Debug::WriteLine(String::Format("DualReadout: {0}",(*AltaCamera)->DualReadout));
+		System::Diagnostics::Debug::WriteLine(String::Format("DigitizationSpeed: {0}",(*AltaCamera)->DigitizationSpeed));
+		System::Diagnostics::Debug::WriteLine(String::Format("NumAds: {0}",(*AltaCamera)->NumAds));
 		//OutputDebugString(String("Camera Model: ") +  String((char*)(*AltaCamera)->CameraModel));
 		
 		Discover	= NULL;		// Release Discover COM object
@@ -165,7 +181,22 @@ namespace forms2{
 	void ApogeeDriver::expose(){
 		
 		if((AltaCamera != NULL) && (*AltaCamera != NULL) ){
+			(*AltaCamera)->ImageCount = framesPerImage;
+		
+
+			if(triggered)	(*AltaCamera)->IoPortAssignment |= 0x01;
+			else			(*AltaCamera)->IoPortAssignment ^= 0x01;
+
+			(*AltaCamera)->TriggerNormalEach = triggered;
+			(*AltaCamera)->TriggerNormalGroup = false;//triggered; //contrary to API doc, but seems necessary!
+
+			System::Diagnostics::Trace::WriteLine(String::Format("Exposing for {0} s.", exposure_time));
+			try{
 			(*AltaCamera)->Expose( exposure_time , true );
+			}
+			catch(Exception^ e){
+				System::Diagnostics::Debug::WriteLine("Exception from Expose()");
+			}
 		}
 	}
 	void ApogeeDriver::stop(){
@@ -179,6 +210,10 @@ namespace forms2{
 			return IMAGE_ERROR;
 		}
 		int state = (*AltaCamera)->ImagingStatus;
+		
+		System::Diagnostics::Trace::WriteLine(String::Format("Camera status: {0}", state));
+		
+		System::Diagnostics::Trace::WriteLine(String::Format("Sequence number: {0}/{1}", (*AltaCamera)->SequenceCounter, (*AltaCamera)->ImageCount));
 		if(state <=0){  // error state or not initialized
 			return IMAGE_ERROR;
 			OutputDebugString( L"Camera in error state!\n" );
@@ -188,7 +223,9 @@ namespace forms2{
 		switch(state){
 		
 		case Apn_Status_ImageReady:
-			return CAMERA_IDLE;
+			if((*AltaCamera)->SequenceCounter== (*AltaCamera)->ImageCount)
+				return CAMERA_IDLE;
+			else return CAMERA_BUSY;
 			break;
 		default:
 		case Apn_Status_ImagingActive:
@@ -218,6 +255,10 @@ namespace forms2{
 	}
 	void ApogeeDriver::readImage(UInt16 *buffer){
 		if((AltaCamera != NULL) && (*AltaCamera != NULL) ){
+			while(Apn_Status_ImageReady != (*AltaCamera)->ImagingStatus){
+				System::Threading::Thread::Sleep(100);
+				OutputDebugString( L"Waiting for image!\n" );
+			}
 			(*AltaCamera)->GetImage((long) buffer);
 		}
 		

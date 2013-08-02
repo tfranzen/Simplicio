@@ -231,8 +231,11 @@ namespace forms2{
 		}
 	}
 	void CameraThread::finishedRunning(){
-		if (callBack)
+		System::Diagnostics::Trace::WriteLine("CamThread finished");
+		if (callBack){
 			mainForm->BeginInvoke(loopFinishedMainWindow);
+			System::Diagnostics::Trace::WriteLine("CamThread called MainForm");
+		}
 		driver->lockCameraDialog(false);
 		running = false;
 	}
@@ -262,6 +265,8 @@ namespace forms2{
 	{
 		const int layers = (int)layersObj;
 		if(singleFrame)	driver->setLayers(layers);
+		else driver->setLayers(1);
+
 		driver->lockCameraDialog(true);
 		driver->armCamera();
 		running=true;
@@ -285,13 +290,19 @@ namespace forms2{
 			readLayers(layersRead);
 			//only expose once for single frame download on apogee
 			if (singleFrame && driver->getDriverName() == "Apogee"){
+				driver->getImageStatus();
+				System::Diagnostics::Trace::WriteLine("Starting single frame exposure");
 				driver->expose();
+				
 			}
 			//loop over each layer of the current image
 			for (int lay=0;lay<layers;lay++)
 			{
+				System::Diagnostics::Trace::WriteLine("Processing layer");
+				driver->getImageStatus();
 				//expose the CCD once for each frame, except for Apogee camera
 				if (!(singleFrame && driver->getDriverName() == "Apogee")){
+					System::Diagnostics::Trace::WriteLine("Exposing layer");
 					driver->expose();
 				}
 				//int picstat;
@@ -300,11 +311,13 @@ namespace forms2{
 				do{
 					//errS=GET_IMAGE_STATUS(&picstat);
 					imgstatus = driver->getImageStatus();
-					Thread::Sleep(0);
+					Thread::Sleep(100);
 				//}while (errS==0 && ((picstat&0x02)!=0 || (dbl==4 && (picstat&16) == 0)) && !getInterrupt());
 				} while (imgstatus == Driver::CAMERA_BUSY && !getInterrupt());		 
 				if (getInterrupt()) break;
 				
+				System::Diagnostics::Trace::WriteLine("Exposure done");
+
 				if (imgstatus == Driver::IMAGE_ERROR){			
 					MessageBox::Show("Error while waiting for image","Box",MessageBoxButtons::OK); break;}
 				if(imgstatus== Driver::CAMERA_BUSY){
@@ -315,15 +328,25 @@ namespace forms2{
 				int width = driver->getImageWidth();
 				int height = driver->getImageHeight();
 
-				if (width != cols || height != dbl*rows){//or if width>cols etc
+				if(!singleFrame){
+				if (width != cols || height*(singleFrame?layers:1) != dbl*rows){//or if width>cols etc
 					MessageBox::Show(String::Format("Wrong dimensions in transfered image. Rows= {0}, Height = {1}",rows, height),"Box",MessageBoxButtons::OK);break;}
 				else{				
 					int bufInd = lay*width*height;
 					driver->readImage(buf+bufInd);
 					layersRead++;
 					readLayers(layersRead);
-				}
+				}}
 			}//end of layer for-loop
+			if(singleFrame){
+							
+					
+					driver->readImage(buf);
+					layersRead+= layers;
+					readLayers(layersRead);
+				}
+
+
 			if (layersRead==layers){//each layer read
 				DateTime datetime = nextTime;
 				if (datetime.Equals(NO_TIME))
@@ -332,12 +355,14 @@ namespace forms2{
 				//copy the image data
 				int templayers=layers;
 				int temprows=rows;
-				
+
 				if (singleFrame && driver->getDriverName() == "Sensicam"){//hijacks existing code to implement this new feature
 					templayers = 8;
 					temprows = 128;
 				}
-				
+				if (singleFrame && driver->getDriverName() == "Apogee"){
+					temprows = rows/layers;
+				}
 				ImageData^ img = gcnew ImageData(buf,temprows,cols,templayers,(dbl==2),singleFrame,datetime); 
 				img->setSeqVars(seqVars);
 				seqVars->Clear();

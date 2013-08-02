@@ -95,6 +95,7 @@ namespace forms2{
 	private: System::Windows::Forms::Label^  subfolderLabel;
 	private: System::Windows::Forms::Button^  newSequenceButton;
 	private: System::Windows::Forms::CheckBox^  triggerCheckbox;
+	private: System::Windows::Forms::NumericUpDown^  exposureBox;
 
 
 
@@ -159,12 +160,14 @@ namespace forms2{
 			this->subfolderLabel = (gcnew System::Windows::Forms::Label());
 			this->newSequenceButton = (gcnew System::Windows::Forms::Button());
 			this->triggerCheckbox = (gcnew System::Windows::Forms::CheckBox());
+			this->exposureBox = (gcnew System::Windows::Forms::NumericUpDown());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->layersBox))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBox))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->zoomBox))->BeginInit();
 			this->previewGroup->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->scaleMaxField))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pixelSizeBox))->BeginInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->exposureBox))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// camDialogButton
@@ -189,7 +192,7 @@ namespace forms2{
 			// 
 			// layersBox
 			// 
-			this->layersBox->Location = System::Drawing::Point(175, 243);
+			this->layersBox->Location = System::Drawing::Point(126, 243);
 			this->layersBox->Minimum = System::Decimal(gcnew cli::array< System::Int32 >(4) {1, 0, 0, 0});
 			this->layersBox->Name = L"layersBox";
 			this->layersBox->Size = System::Drawing::Size(35, 20);
@@ -200,7 +203,7 @@ namespace forms2{
 			// layersLabel
 			// 
 			this->layersLabel->AutoSize = true;
-			this->layersLabel->Location = System::Drawing::Point(61, 250);
+			this->layersLabel->Location = System::Drawing::Point(12, 250);
 			this->layersLabel->Name = L"layersLabel";
 			this->layersLabel->Size = System::Drawing::Size(108, 13);
 			this->layersLabel->TabIndex = 3;
@@ -515,6 +518,8 @@ namespace forms2{
 			// singleFrameCheckBox
 			// 
 			this->singleFrameCheckBox->AutoSize = true;
+			this->singleFrameCheckBox->Checked = true;
+			this->singleFrameCheckBox->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->singleFrameCheckBox->Location = System::Drawing::Point(223, 237);
 			this->singleFrameCheckBox->Name = L"singleFrameCheckBox";
 			this->singleFrameCheckBox->Size = System::Drawing::Size(84, 17);
@@ -582,7 +587,6 @@ namespace forms2{
 			// triggerCheckbox
 			// 
 			this->triggerCheckbox->AutoSize = true;
-			this->triggerCheckbox->Enabled = false;
 			this->triggerCheckbox->Location = System::Drawing::Point(223, 254);
 			this->triggerCheckbox->Name = L"triggerCheckbox";
 			this->triggerCheckbox->Size = System::Drawing::Size(71, 17);
@@ -590,11 +594,23 @@ namespace forms2{
 			this->triggerCheckbox->Text = L"Triggered";
 			this->triggerCheckbox->UseVisualStyleBackColor = true;
 			// 
+			// exposureBox
+			// 
+			this->exposureBox->DecimalPlaces = 1;
+			this->exposureBox->Increment = System::Decimal(gcnew cli::array< System::Int32 >(4) {1, 0, 0, 65536});
+			this->exposureBox->Location = System::Drawing::Point(165, 244);
+			this->exposureBox->Maximum = System::Decimal(gcnew cli::array< System::Int32 >(4) {1000, 0, 0, 0});
+			this->exposureBox->Name = L"exposureBox";
+			this->exposureBox->Size = System::Drawing::Size(48, 20);
+			this->exposureBox->TabIndex = 38;
+			this->exposureBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {5, 0, 0, 0});
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(1259, 981);
+			this->Controls->Add(this->exposureBox);
 			this->Controls->Add(this->triggerCheckbox);
 			this->Controls->Add(this->newSequenceButton);
 			this->Controls->Add(this->subfolderLabel);
@@ -636,6 +652,7 @@ namespace forms2{
 			this->previewGroup->PerformLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->scaleMaxField))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pixelSizeBox))->EndInit();
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->exposureBox))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -670,10 +687,15 @@ namespace forms2{
 		bool interruptImageLoop;
 		bool listmode;
 		bool wasLooped;
+		bool restart;
+		bool restartlooped;
+
 		double manualExpTime;
+		int newLayerCount;
 		int listIterNum;
 		int prevListIterNum;
 		String^ filePath;
+		DateTime nextRunTime;
 		//UInt16 layers;
 		//CameraSettings camSet;
 		CameraThread^ camThread;

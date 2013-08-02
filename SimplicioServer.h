@@ -43,6 +43,7 @@ namespace forms2{
 		SettingsData^ mySettings;
 		SequenceData^ mySequence;
 		int triggerChannel;
+		double liststarttime, prevliststarttime;
 		//DateTime nextRunTime;
 	};
 }

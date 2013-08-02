@@ -85,12 +85,14 @@ namespace forms2{
 
     bool SimplicioServer::runSuccess()
     {
-       mainForm->BeginInvoke(seqEndedMainForm,gcnew array<Object^>(0));
+     //  mainForm->BeginInvoke(seqEndedMainForm,gcnew array<Object^>(0));
 		return true;
     }
 
     bool SimplicioServer::setSequence(SequenceData^ sequence)
     {
+		System::Diagnostics::Debug::WriteLine("setting sequence");
+
 		List<Variable^>^ vars = sequence->Variables;
 		LinkedList<Variable^>^ listVars = gcnew LinkedList<Variable^>();
 		int count(0);
@@ -126,9 +128,26 @@ namespace forms2{
 
 		}
 
+		prevliststarttime = liststarttime;
+		liststarttime = 0;
+		for each(Variable^ var in vars){
+			if(var->VariableName == "ListStartTime"){
+				liststarttime = var->VariableValue;
+				System::Diagnostics::Debug::WriteLine(String::Format("ListStartTime: {0}", var->VariableValue ));
+			}
+		}
+
 		array<Object^>^ parameters = gcnew array<Object^>(4);
 		parameters[0] = listVars;
-		parameters[1] = sequence->ListIterationNumber;
+		
+		// detect new list
+		if((liststarttime != prevliststarttime) && (liststarttime != 0)){
+			parameters[1] = 1;
+			System::Diagnostics::Debug::WriteLine("New Listrun");
+		}
+		else{
+			parameters[1] = 0;
+		}
 		parameters[2] = triggerCount;
 		parameters[3] = exptime;
 		mainForm->BeginInvoke(seqStartedMainForm, parameters);
@@ -145,7 +164,7 @@ namespace forms2{
 			if(dc[i]->Name == serverName){
 				// found trigger Channel
 				triggerChannel = i;
-
+				System::Diagnostics::Debug::WriteLine("Found trigger channel");
 			}
 		}
         return true;

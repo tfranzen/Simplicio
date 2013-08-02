@@ -48,6 +48,8 @@ namespace forms2{
 		displayedImgInd = 0;
 		displayedLayer = 0;
 		listmode = false;
+		restart = false;
+		restartlooped = false;
 
 
 		manualExpTime = 0.005;
@@ -65,15 +67,15 @@ namespace forms2{
 		cameraNameLabel->Text = camThread->getCameraDriverName();
 
 		layersBox->Value=1;
-
+		newLayerCount =1;
 		//Load default folder name
 		String^ foldername;
 		String^ line;
 		try{
 			FileStream^ fs = File::Open("settings.txt",FileMode::OpenOrCreate);
 			StreamReader^ sr = gcnew StreamReader(fs);
-			do{
-				line = sr->ReadLine();
+			
+			while((line = sr->ReadLine())!=nullptr){
 				if (line->Contains("savefolder"))
 				{
 					int ind = line->IndexOf('=');
@@ -110,7 +112,8 @@ namespace forms2{
 					}
 				}
 				
-			} while (line!=nullptr);
+			} 
+
 			sr->Close();
 			fs->Close();
 		}catch (Exception^){}
@@ -599,10 +602,13 @@ namespace forms2{
 	
 	void Form1::acquire(bool runLoop)
 	{
+		camThread->setExposure((double) exposureBox->Value,triggerCheckbox->Checked);
 		bool err = camThread->acquire((int)layersBox->Value,runLoop);
 		if (!err){
 			runIndicator->Checked = true;
 			layersBox->Enabled = false;
+			exposureBox->Enabled = false;
+			triggerCheckbox->Enabled = false;
 			imageProgressBar->Maximum = (int)layersBox->Value;
 			imageProgressBar->Value = 0;
 		}
@@ -645,41 +651,53 @@ namespace forms2{
 	}
 	void Form1::loopFinished(){
 		layersBox->Enabled = true;
+		exposureBox->Enabled = true;
+		triggerCheckbox->Enabled = true;
+		layersBox->Value = newLayerCount;
 		runIndicator->Checked = false;
+		/*if(restart){
+			restart = false;
+			acquire(restartlooped);
+		}*/
+		System::Diagnostics::Trace::WriteLine("MainForm callback executed");
 	}
 	void Form1::setNextTime(DateTime nextTime){
 		camThread->setNextTime(nextTime);
+		nextRunTime = nextTime;
 	}
 
 
 	void Form1::sequenceEnded(){
-		camThread->setExposure(manualExpTime,false);
-		triggerCheckbox->Checked = false;
-		layersBox->Value = 1;
-
-		if(wasLooped){
+		//camThread->setExposure(manualExpTime,false);
+		//triggerCheckbox->Checked = false;
+		//layersBox->Value = 1;
+		//setSaveData(false);
+		//if(wasLooped){
 			// restart loop
-			acquire(true);			
-		}
+			//restart = true;
+			//restartlooped = true;	
+		//}
 	}
 
 
 	void Form1::sequenceStarted(LinkedList<Variable^>^ listvars, int iterNum, int trigCount, double exptime){
 		//upcomingListVars = listvars;
 		wasLooped = camThread->getContinue();
-		if(wasLooped){
-			// currently looping
-			interrupt(true);			
-		}
+		//if(camThread->isRunning()){
+		//	// currently looping
+		//	interrupt(true);
+		//}
 		
 		camThread->setSeqVars(listvars);
-		acquire(false);
+		
 
 		if(trigCount>0){ // autodetected number of images and exposure time
 			trigLabel->Text = String::Format("Autodetected {0} triggers, exposure time {1} s.", trigCount,exptime);
 			layersBox->Value = trigCount;
-			camThread->setExposure(exptime*1000.0,true);
+			newLayerCount = trigCount;
+			exposureBox->Value = System::Decimal(exptime*1000.0);
 			triggerCheckbox->Checked = true;
+			setSaveData(true);
 		}
 		else
 		{
@@ -688,25 +706,27 @@ namespace forms2{
 
 		
 
-		listIterNum = iterNum;
-		if(iterNum>0){ //list mode
-			if((listmode == false) || (listIterNum < prevListIterNum))
-			{
-				saveCheckBox->Checked = true;
-				listmode = true;
-				// add code to start new image directory
-			}
+		
+		if(iterNum>0){ //new list
+				//saveCheckBox->Checked = true;
+				//listmode = true;
+				newSequence(nextRunTime);
+		}
+		
+		
 
+		//acquire(false);
+		for(int i = 0; (i< 50) && camThread->isRunning(); i++){
+		//while(camThread->isRunning()){
+			Thread::Sleep(20);
 		}
-		else
-		{	
-			if(listmode == true)
-			{
-				saveCheckBox->Checked = false;
-				listmode = false;
-			}
+			/*
+			restart = true; 
+			restartlooped = false;
 		}
-		prevListIterNum = iterNum;
+		else{*/
+			acquire(false);
+		//}
 	}
 	
 

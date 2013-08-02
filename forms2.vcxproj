@@ -86,6 +86,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <Reference Include="DataStructures, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>DataStructures.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.WINX32Lib, Version=3.11.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>PI\Interop.WINX32Lib.dll</HintPath>
     </Reference>
@@ -110,11 +113,6 @@
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
     </Reference>
     <Reference Include="System.DirectoryServices">
-      <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
-      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
-    </Reference>
-    <Reference Include="DataStructures, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>DataStructures.dll</HintPath>
       <CopyLocalSatelliteAssemblies>true</CopyLocalSatelliteAssemblies>
       <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
     </Reference>
@@ -177,6 +175,7 @@
     <ClInclude Include="WinXDriver.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>

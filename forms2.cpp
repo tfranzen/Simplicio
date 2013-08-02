@@ -13,6 +13,11 @@ int main(array<System::String ^> ^args)
 	System::Runtime::Remoting::Lifetime::LifetimeServices::LeaseTime = TimeSpan(1000, 0, 0, 0, 0);
 
 	// Create the main window and run it
+	try{
 	Application::Run(gcnew Form1());
+	}
+	catch(Exception^ e){
+		System::Diagnostics::Debug::WriteLine("Exception");
+	}
 	return 0;
 }

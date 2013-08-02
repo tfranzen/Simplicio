@@ -166,7 +166,7 @@ namespace forms2{
 					//buffers[bufLay]->Graphics->FillRectangle(brush,Rectangle(pixelSize*c/binSize,pixelSize*r/binSize,pixelSize,pixelSize));
 				}
 				
-				if (singleFrame)//define preview layer for single frame kinetics imaging
+				if (singleFrame && false)//define preview layer for single frame kinetics imaging
 				{
 					PWA=counts[1];
 					PWOA=counts[2];
