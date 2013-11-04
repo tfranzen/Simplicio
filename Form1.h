@@ -520,8 +520,6 @@ namespace forms2{
 			// singleFrameCheckBox
 			// 
 			this->singleFrameCheckBox->AutoSize = true;
-			this->singleFrameCheckBox->Checked = true;
-			this->singleFrameCheckBox->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->singleFrameCheckBox->Location = System::Drawing::Point(223, 237);
 			this->singleFrameCheckBox->Name = L"singleFrameCheckBox";
 			this->singleFrameCheckBox->Size = System::Drawing::Size(84, 17);
