@@ -230,29 +230,34 @@ namespace forms2{
 					//add to Ncount
 					Ncount += -Math::Log(floatRatio) * binSize * binSize;		
 				}//end of layers==3
-				else if (makePreview && layers==2)//define preview layer for three frame imaging
+
+				else if (makePreview && layers==2)//define preview layer for two frame imaging
 				{	
-						/*if(normalize)
+						if(normalize)
 							ratio = (255*(counts[0]-counts[1]))/maxVals[0];
-						else*/
+						else
 							ratio = (255*(counts[0]-counts[1]))/scaleMax;
 						value = min(255,(int)ratio);
 						x = pixelSize*c/binSize;
 						y = pixelSize*r/binSize;
 						for(int dx=0;dx<pixelSize;dx++){
-						for(int dy=0;dy<pixelSize;dy++){
-						if(useFalseColor){					
-							for (int rgb=0;rgb<4;rgb++)
-								bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+							for(int dy=0;dy<pixelSize;dy++){
+								if(useFalseColor){					
+									for (int rgb=0;rgb<4;rgb++)
+										bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:(falseColorScale[value][rgb]);
+								}
+								else{
+									for (int rgb=0;rgb<4;rgb++)
+										bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:value;
+								}			
+							}
 						}
-						else{
-							for (int rgb=0;rgb<4;rgb++)
-								bmpValues[0][(y+dy)*stride+bytesPerPixel*(x+dx)+rgb] = (rgb==3)? 255:value;
-						}			
-						}
-						}
-						Ncount += value * binSize * binSize;		
+						Ncount += (counts[0]-counts[1]) * binSize * binSize;		
 				}//end of layers==2
+				else if (layers==1)//define preview layer for two frame imaging
+				{			
+						Ncount += counts[0] * binSize * binSize;		
+				}//end of layers==1
 			}//end for loop on c
 		}//end for loop on r
 
@@ -303,6 +308,11 @@ namespace forms2{
 		//send buffers to main window
 		//if(callBack)
 		
+		Variable^ newVar = gcnew Variable();
+		newVar->VariableValue = Ncount;
+		newVar->VariableName = "Ncount";
+		imageData->getSeqVars()->AddLast(newVar);
+
 		array<Object^>^ parameters = gcnew array<Object^>(3);
 		parameters[0] = buffers;
 		parameters[1] = numBuffers;

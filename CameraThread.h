@@ -1,4 +1,6 @@
 #pragma once
+
+
 namespace forms2{
 
 	ref class Form1;
@@ -15,7 +17,7 @@ namespace forms2{
 	{
 	public:	
 		CameraThread(Form1^ f, String^ path){init(f,path);}
-		~CameraThread(){closeCamera(); }
+		~CameraThread(){closeCamera();  }
 		
 		void initCamera();
 		bool acquire(int layers, bool runLoop);

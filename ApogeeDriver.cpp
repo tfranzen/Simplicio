@@ -70,41 +70,44 @@ namespace forms2{
 		Discover->DlgCheckEthernet	= false;
 		Discover->DlgCheckUsb		= true;
 
-		// Display the dialog box for finding an Alta camera
-		Discover->ShowDialog( true );
+		// try selecting first ÚSB camera, else prompt for selection
+		try{
+		hr = (*AltaCamera)->Init( Apn_Interface_USB, 
+			0,
+			0,
+			0x0 );
+		}
+		catch(Exception^ e){
+			// Display the dialog box for finding an Alta camera
+			Discover->ShowDialog( true );
 
-		// If a camera was not selected, then release objects and exit
-		if ( !Discover->ValidSelection )
-		{
-			OutputDebugString( L"No valid camera selection made\n" );
-			Discover	= NULL;		// Release ICamDiscover COM object
-			CoUninitialize();		// Close the COM library
-			return NO_CAMERA;
+			// If a camera was not selected, then release objects and exit
+			if ( !Discover->ValidSelection )
+			{
+				OutputDebugString( L"No valid camera selection made\n" );
+				Discover	= NULL;		// Release ICamDiscover COM object
+				CoUninitialize();		// Close the COM library
+				return NO_CAMERA;
+			}
+
+			// Initialize camera using the ICamDiscover properties
+			hr = (*AltaCamera)->Init( Discover->SelectedInterface, 
+				Discover->SelectedCamIdOne,
+				Discover->SelectedCamIdTwo,
+				0x0 );
 		}
 
-		// Initialize camera using the ICamDiscover properties
-		hr = (*AltaCamera)->Init( Discover->SelectedInterface, 
-			Discover->SelectedCamIdOne,
-			Discover->SelectedCamIdTwo,
-			0x0 );
-
-		/*hr = (*AltaCamera)->Init( Apn_Interface_USB, 
-			0,
-			0,
-			0x0 );*/
-
-
-		roix1 = 100;
-		roix2 = 400;
-		roiy1 = 100;
-		roiy2 = 400;
+		roix1 = 0;
+		roix2 = 639;
+		roiy1 = 0;
+		roiy2 = 479;
 
 		(*AltaCamera)->RoiStartX = roix1;		
 		(*AltaCamera)->RoiStartY = roiy1;
 		(*AltaCamera)->RoiPixelsH = roix2-roix1;		
 		(*AltaCamera)->RoiPixelsV = roiy2-roiy1;
 
-		
+		// LED A for armed, B for flushing
 		(*AltaCamera)->LedMode = Apn_LedMode_EnableAll; 
 		(*AltaCamera)->LedA = Apn_LedState_ExtTriggerWaiting; 
 		(*AltaCamera)->LedB = Apn_LedState_Flushing;
@@ -112,7 +115,7 @@ namespace forms2{
 		//(*AltaCamera)->DualReadout = true;
 		
 
-		(*AltaCamera)->DigitizationSpeed = 1; // 1 ist fast
+		(*AltaCamera)->DigitizationSpeed = 0; // 0 is normal, 1 is fast
 		(*AltaCamera)->SequenceBulkDownload = true;
 		(*AltaCamera)->ImageCount = framesPerImage;
 
@@ -171,10 +174,10 @@ namespace forms2{
 		
 
 		if(triggered)	(*AltaCamera)->IoPortAssignment |= 0x01;
-		else			(*AltaCamera)->IoPortAssignment ^= 0x01;
+		else			(*AltaCamera)->IoPortAssignment &= ~0x01;
 
 		(*AltaCamera)->TriggerNormalEach = triggered;
-		(*AltaCamera)->TriggerNormalGroup = triggered;
+		(*AltaCamera)->TriggerNormalGroup = false;// triggered;
 		
 		return 0;
 	}
@@ -185,17 +188,20 @@ namespace forms2{
 		
 
 			if(triggered)	(*AltaCamera)->IoPortAssignment |= 0x01;
-			else			(*AltaCamera)->IoPortAssignment ^= 0x01;
+			else			(*AltaCamera)->IoPortAssignment &= ~0x01;
 
 			(*AltaCamera)->TriggerNormalEach = triggered;
 			(*AltaCamera)->TriggerNormalGroup = false;//triggered; //contrary to API doc, but seems necessary!
 
-			System::Diagnostics::Trace::WriteLine(String::Format("Exposing for {0} s.", exposure_time));
+			System::Diagnostics::Trace::WriteLine(String::Format("Exposing for {1} frames for {0} s.", exposure_time, framesPerImage));
+			int state = (*AltaCamera)->ImagingStatus;
+			System::Diagnostics::Debug::WriteLine(String::Format("Camera Status: {0}", state));
+
 			try{
 			(*AltaCamera)->Expose( exposure_time , true );
 			}
 			catch(Exception^ e){
-				System::Diagnostics::Debug::WriteLine("Exception from Expose()");
+				System::Diagnostics::Debug::WriteLine(String::Format("Exception from Expose(): {0}", e->Message));
 			}
 		}
 	}

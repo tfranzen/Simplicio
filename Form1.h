@@ -2,7 +2,7 @@
 
 namespace forms2{
 #include "globalobjects.h"
-
+#include "stdafx.h"
 	using namespace System;
 	using namespace System::ComponentModel;
 	using namespace System::Collections;
@@ -409,6 +409,8 @@ namespace forms2{
 			// normalizeCheckbox
 			// 
 			this->normalizeCheckbox->AutoSize = true;
+			this->normalizeCheckbox->Checked = true;
+			this->normalizeCheckbox->CheckState = System::Windows::Forms::CheckState::Checked;
 			this->normalizeCheckbox->Location = System::Drawing::Point(22, 250);
 			this->normalizeCheckbox->Name = L"normalizeCheckbox";
 			this->normalizeCheckbox->Size = System::Drawing::Size(70, 17);
@@ -462,7 +464,7 @@ namespace forms2{
 			this->pixelSizeBox->Name = L"pixelSizeBox";
 			this->pixelSizeBox->Size = System::Drawing::Size(32, 20);
 			this->pixelSizeBox->TabIndex = 23;
-			this->pixelSizeBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {2, 0, 0, 0});
+			this->pixelSizeBox->Value = System::Decimal(gcnew cli::array< System::Int32 >(4) {1, 0, 0, 0});
 			// 
 			// saveCheckBox
 			// 
@@ -644,6 +646,7 @@ namespace forms2{
 			this->Icon = (cli::safe_cast<System::Drawing::Icon^  >(resources->GetObject(L"$this.Icon")));
 			this->Name = L"Form1";
 			this->Text = L"Simplicio SensiCam Controller";
+			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &Form1::Form1_FormClosed);
 			this->ResizeEnd += gcnew System::EventHandler(this, &Form1::Form1_ResizeEnd);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->layersBox))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^  >(this->pictureBox))->EndInit();
@@ -728,6 +731,7 @@ namespace forms2{
 		void interrupt(bool callback);
 		bool openCameraDialog();
 		void initCamera();
+		void closeCamera();
 		void changeCamera();
 	//	void takeImage(Object^ runloop);
 	//	void saveImage(UInt16 rows, UInt16 cols, UInt16 lays, UInt16 *buf);
@@ -816,6 +820,9 @@ private: System::Void layersBox_ValueChanged(System::Object^  sender, System::Ev
 		 }
 private: System::Void newSequenceButton_Click(System::Object^  sender, System::EventArgs^  e) {
 			 newSequence(DateTime::Now);
+		 }
+private: System::Void Form1_FormClosed(System::Object^  sender, System::Windows::Forms::FormClosedEventArgs^  e) {
+			 closeCamera();
 		 }
 };
 }

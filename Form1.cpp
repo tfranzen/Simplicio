@@ -595,6 +595,11 @@ namespace forms2{
 	{
 		camThread->stop();
 	}
+	void Form1::closeCamera()
+	{
+		camThread->closeCamera();
+	}
+
 	void Form1::interrupt(bool callback)
 	{
 		camThread->interrupt(callback);

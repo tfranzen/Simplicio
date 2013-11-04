@@ -1,4 +1,4 @@
 savefolder=I:\Data
-servername=camera top
+servername=apogee camera
 camera=Apogee
 saveformat=dus

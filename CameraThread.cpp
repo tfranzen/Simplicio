@@ -177,7 +177,9 @@ namespace forms2{
 		CLOSE_DIALOG_CAM();
 		SET_INIT(0);
 		*/
-		driver->closeCamera();
+		
+			driver->closeCamera();
+			System::Diagnostics::Trace::WriteLine("Camera closed" );
 	}
 	bool CameraThread::getContinue(){
 		bool continueTemp=false;
